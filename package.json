@@ -1,0 +1,33 @@
+{
+  "name": "tcs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "babel-preset-react": "^6.5.0",
+    "es6-promise": "^3.2.1",
+    "isomorphic-fetch": "^2.2.1",
+    "rc-dialog": "",
+    "rc-table": "^4.0.0-beta.6",
+    "rc-tabs": "^0.5.3",
+    "rc-menu": "^4.12.2",
+    "rc-select": "^6.3.3",
+    "rc-input-number": "^2.5.10",
+    "rc-trigger": "^1.5.0",
+    "rc-dropdown": "^1.4.8",
+    "rc-tree-select": "^1.7.3",
+    "react": "^15.0.1",
+    "react-dom": "^15.0.1",
+    "react-redux": "^4.4.2",
+    "redux": "^3.4.0",
+    "redux-logger": "^2.6.1",
+    "redux-thunk": "^2.1.0",
+    "webpack": "^1.12.14"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jeremy Liu",
+  "license": "ISC",
+  "description": ""
+}

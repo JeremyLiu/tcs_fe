@@ -1,0 +1,58 @@
+body{
+	text-align: center;
+	font-family: SimSun;
+	/*background: #f3f6fc;*/
+}
+a{
+	cursor: pointer;
+}
+.login-topbar{
+	background-color:#747F9A;
+	width:100%;
+	height:70px;
+	font-size: 15px;
+}
+.login-logo{
+	margin-top:15px;
+	margin-left: 15px;
+	padding-top: 12px;
+	float: left;
+}
+.login-logo img{
+	width: 40px;
+	height: 40px;
+
+}
+.login-text{
+	text-align: left;
+	padding-left: 20px;
+	padding-top: 27px;
+	float: left;
+	color: white;
+}
+.login-center{
+	width: 33%;
+	height: 350px;
+	margin-left: 33%;
+	margin-right: 33%;
+	margin-top: 0;
+	float: left;
+}
+
+.login-title{
+	width: 100%;
+	padding-top: 40px;
+	padding-bottom: 40px;
+	font-size: 20px;
+	font-weight:  bold; 
+	text-align: center;
+}
+.login-form{
+	float: left;
+}
+.login-btn{
+	width: 32%;
+	margin-right: 10%;
+	/*background: #8183a0;*/
+	/*color: white;*/
+}
