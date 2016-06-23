@@ -243,6 +243,7 @@ function addUserDialog(state = { visible: false},action){
     }
 }
 
+
 export default combineReducers({
     card,
     cardConfig,
@@ -251,5 +252,5 @@ export default combineReducers({
     confirmDialog,
     deviceDialog,
     devicePortDialog,
-    addUserDialog
+    addUserDialog,
 });

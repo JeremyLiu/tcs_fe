@@ -2,6 +2,9 @@ import React from 'react'
 import {connect} from 'react-redux'
 import Table from 'rc-table'
 import 'rc-table/assets/index.css'
+import SwitchView from '../../common/component/switchview.js'
+import {businessBriefColumn, businessColumns} from '../../constant/model.js'
+import {fetch_business, fetch_busisness_data} from '../../action/network.js'
 
 const columns = [
     {
@@ -49,20 +52,47 @@ const data = [
 ];
 
 var BusinessMonitor = React.createClass({
-   render(){
+    
+    switchView(record){
+        let {dispatch} = this.props;
+        dispatch(fetch_busisness_data(record.type));
+    },
+    render(){
        return (
-            <Table className="table table-bordered compact-3"
-                   columns={columns}
-                   data={data}
-                   style={{
-                width: 600
-            }}/>
+       <div>
+           <div>
+               <button style={{display:this.props.visible?'inline-block':'none',
+                                    marginLeft: 40}}
+                       className="btn btn-default left-float"
+                       onClick={() => this.props.dispatch(fetch_business())}>返回</button>
+           </div>
+           <SwitchView active={this.props.visible?1:0}>
+               <Table className="table table-bordered compact-3"
+                      columns={businessBriefColumn}
+                      data={this.props.brief.map((e,index) => Object.assign({},e,{key: index}))}
+                      style={{
+                        width: 600
+                        }}
+                      onRowClick={this.switchView}
+               />
+               <div>
+                   <Table className="table table-bordered compact-3"
+                          columns={businessColumns[this.props.curDetail]}
+                          data={this.props.detail.map((e,index) => Object.assign({},e,{key: index}))}
+                          style={{
+                    width: 600
+                    }}/>
+               </div>
+           </SwitchView>
+       </div>
+    
+    
        )
-   }
+    }
 });
 
 function stateMap(state){
-    return state.sysMonitor.businessRecord;
+    return state.business;
 }
 
-export default connect()(BusinessMonitor);
+export default connect(stateMap)(BusinessMonitor);

@@ -1,43 +1,8 @@
 import React from 'react'
 import Table from 'rc-table'
-
-const columns = [
-    {
-        render: () => <input type="checkbox" />,
-        width:30
-    },
-    {
-        key: "id",
-        title: "序号",
-        dataIndex: "id",
-        width: 40
-    },
-    {
-        key: "calling_number",
-        title: "主叫号码",
-        dataIndex: "calling_number",
-        width: 120
-    },
-    {
-        key: "called_number",
-        title: "被叫号码",
-        dataIndex: "called_number",
-        width: 120
-    },
-    {
-        key: "create_time",
-        title: "录音开始时间",
-        dataIndex: "create_time",
-        width: 150
-    },
-    {
-        key: "time",
-        title: "时长",
-        dataIndex: "time",
-        width: 80
-    }
-];
-
+import {connect} from 'react-redux'
+import {recordColumns, dateFormat, getTimeStr} from '../constant/model.js'
+import {fetch_record} from '../action/network.js'
 const data = [
     {
         key: 1,
@@ -59,8 +24,12 @@ const data = [
 
 var Record = React.createClass({
 
+    componentWillMount(){
+        this.props.dispatch(fetch_record());
+    },
+
     componentDidMount(){
-        $('.form-date').datepicker({
+        $('input.form-date').datepicker({
             format : "yyyy-mm-dd",
             language : "zh-CN",
             autoclose : true,
@@ -71,31 +40,45 @@ var Record = React.createClass({
 
     render(){
         return <div>
-            <div className="row" style={{marginLeft: 30}}>
-                <div className="select-group">
-                    <label className="label-text">日期范围：</label>
-                    <div className="">
-                        <input type="text" readonly="readonly" maxlength="20" className="n_input_text form-date"
-                               defautValue="" />
-                        <span className="label-text">至</span>
-                        <input type="text" readonly="readonly" maxlength="20" className="n_input_text form-date"
-                               defautValue="" />
-                    </div>
+            <form className="form-inline" style={{marginLeft: 30}}>
+                <div className="form-group">
+                    <label>日期范围：</label>
+
+                    <input type="text" readonly="readonly" maxlength="20"
+                           className="form-control form-date compact-inline"
+                           defautValue="" />
+                    <label>至</label>
+                    <input type="text" readonly="readonly" maxlength="20"
+                           className="form-control form-date compact-inline"
+                           defautValue="" />
                 </div>
-                <div className="select-group">
-                    <input type="text" className="n_input_text" placeholder="输入主叫/被叫号码查询"/>
-                    <button type="button" className="btn btn-default" style={{float: "left"}}>搜索</button>
+                <div className="form-group">
+                    <input type="text" className="form-control compact-inline" placeholder="输入主叫/被叫号码查询"/>
                 </div>
-                <div className="select-group">
-                    <button className="btn btn-default">删除</button>
-                    <button className="btn btn-default">录音</button>
-                </div>
-            </div>
+                <button type="button" className="btn btn-default">查询</button>
+            </form>
             <Table className="table table-bordered compact-3"
-                columns={columns}
-                data={data}/>
+                columns={recordColumns}
+                data={[
+                    ...this.props.current,
+                    ...this.props.history
+                ]} style={{width: '80%'}}/>
         </div>;
     }
 });
 
-export default Record;
+function stateMap(state){
+    let itemMap = (e,index) => {
+        return Object.assign({},e,{
+            key: index,
+            startTime: dateFormat(e.startTime),
+            period: getTimeStr(e.period)
+        })
+    };
+    return {
+        current: state.record.current.map(itemMap),
+        history: state.record.history.map(itemMap)
+    }
+}
+
+export default connect(stateMap)(Record);

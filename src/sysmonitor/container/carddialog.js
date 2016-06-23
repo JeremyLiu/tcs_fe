@@ -6,7 +6,7 @@ import NetworkStatusBar, * as NetStatus from '../component/networkstatusbar.js'
 import GridView from '../../common/component/gridview.js'
 import {REFRESH_INTERVAL} from "../../constant/model.js"
 import Table from 'rc-table'
-import {fetch_card_state} from '../../action/network.js'
+import {fetch_card_state, set_timer} from '../../action/network.js'
 
 const space = 5;
 const width = 30;
@@ -62,12 +62,13 @@ var CardDialog = React.createClass({
 
     componentWillReceiveProps(nextProps){
         let id = nextProps.netunit.id;
-        if(nextProps.visible && !this.props.visible)
-            this.timer = setInterval(function(){
-                this.props.dispatch(fetch_card_state(id));
-            }.bind(this), REFRESH_INTERVAL);
-        else if(!nextProps.visible && this.props.visible)
-            clearInterval(this.timer);
+        let {dispatch} = this.props;
+        if(nextProps.visible && !this.props.visible) {
+            dispatch(fetch_card_state(id));
+            dispatch(set_timer(setInterval(function () {
+                dispatch(fetch_card_state(id));
+            }, REFRESH_INTERVAL)));
+        }
     },
 
     getSelect(){

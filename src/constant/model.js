@@ -19,7 +19,7 @@ export const selectView = [
 ];
 
 export const OP_CARD_TYPE = 10;
-export const REFRESH_INTERVAL = 5000;
+export const REFRESH_INTERVAL = 2000;
 
 export const deviceMenu = [
     {
@@ -198,7 +198,327 @@ export const menu = [
     }
 ];
 
+export const businessBriefColumn = [
+    {
+        key: "id",
+        title: "序号",
+        dataIndex: "id",
+        width: 50
+    },
+    {
+        key: "name",
+        title: "业务名称",
+        dataIndex: "name",
+        width: 200
+    },
+    {
+        key: "img",
+        title: "业务类型",
+        dataIndex: "img",
+        width: 200,
+        render: (value, row, index) => <img src={value}/>
+    },
+    {
+        key: "count",
+        dataIndex: "count",
+        title: "数量",
+        width: 80
+    }
+];
 
 export function rangeArray(start, end){
     return Array(end - start + 1).fill(0).map((v, i) => i + start);
 }
+
+export function dateFormat(timestamp){
+    let date = new Date(timestamp);
+    return date.getFullYear()+"-"+
+        (date.getMonth()+1)+
+        "-"+date.getDate()+" "+
+        date.getHours()+":"+
+        date.getMinutes()+":"+
+        date.getSeconds();
+}
+
+export function getTimeStr(time){
+    if(time<1000)
+        return time/1000+'秒';
+    else
+        time = time/1000;
+    let result = '';
+    const timeSpan = [
+        {
+            span: 1,
+            text: '秒'
+        },
+        {
+            span: 60,
+            text: '分'
+        },
+        {
+            span: 3600,
+            text: '小时'
+        },
+        {
+            span: 24*3600,
+            text: '天'
+        },
+        {
+            span: 24*3600*365,
+            text: '年'
+        }
+    ];
+
+    timeSpan.forEach(e => {
+        if(time>= e.span) {
+            result += Math.floor(time/e.span) + e.text;
+            time = time % e.span;
+        }
+    });
+    return result;
+}
+
+const businessStateMap = {
+    0: "green",
+    1: "grey"
+};
+
+const tongling = [
+    {
+        key: "netunitName",
+        dataIndex: "netunitName",
+        title: "网元"
+    },
+    {
+        key: "number",
+        dataIndex: "number",
+        title: "号码",
+        width: "150"
+    },
+    {
+        key: "chairman",
+        dataIndex: "chairman",
+        title: "主席",
+    },
+    {
+        key: "superior",
+        dataIndex: "superior",
+        title: "长官"
+    },
+    {
+        key: "name",
+        dataIndex: "name",
+        title: "名称"
+    },
+    {
+        key: "commander",
+        dataIndex: "commander",
+        title: "指挥"
+    },
+    {
+        key: "member",
+        dataIndex: "member",
+        title: "成员",
+        render: (value,row, index) => <ul className="table-list">
+            {
+                value.map(e => <li className="table-list-item" style={{backgroundColor:businessStateMap[e.state]}}>e.number</li>)
+            }
+        </ul>
+    }
+];
+
+const p2p = [
+    {
+        key: "netunitName",
+        dataIndex: "netunitName",
+        title: "网元"
+    },
+    {
+        key: "caller",
+        dataIndex: "caller",
+        title:"主叫号码"
+    },
+    {
+        key: "second",
+        dataIndex: "second",
+        title: "被叫号码",
+        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>value.number</span>
+    }
+];
+
+const meeting = [
+    {
+        key: "netunitName",
+        dataIndex: "netunitName",
+        title: "网元"
+    },
+    {
+        key: "number",
+        dataIndex: "number",
+        title: "号码"
+    },
+    {
+        key: "name",
+        dataIndex: "name",
+        title: "名称"
+    },
+    {
+        key: "caller",
+        dataIndex: "caller",
+        title: "主叫号码"
+    },
+    {
+        key: "member",
+        dataIndex: "member",
+        title: "成员",
+        render: (value,row, index) => <ul className="table-list">
+            {
+                value.map(e => <li className="table-list-item" style={{backgroundColor:businessStateMap[e.state]}}>e.number</li>)
+            }
+        </ul>
+    }
+];
+
+const threetalk = [
+    {
+        key: "netunitName",
+        dataIndex: "netunitName",
+        title: "网元"
+    },
+    {
+        key: "caller",
+        dataIndex: "caller",
+        title: "主叫号码"
+    },
+    {
+        key: "second",
+        dataIndex: "second",
+        title: "被叫号码1",
+        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>value.number</span>
+    },
+    {
+        key: "third",
+        dataIndex: "third",
+        title: "被叫号码2",
+        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>value.number</span>
+    }
+];
+
+const broadcast = [
+    {
+        key: "netunitName",
+        dataIndex: "netunitName",
+        title: "网元"
+    },
+    {
+        key: "number",
+        dataIndex: "number",
+        title: "号码"
+    },
+    {
+        key: "device",
+        dataIndex: "device",
+        title: ""
+    },
+    {
+        key: "name",
+        dataIndex: "name",
+        title: "名称"
+    },
+    {
+        key: "member",
+        dataIndex: "member",
+        title: "成员",
+        render: (value,row, index) => <ul className="table-list">
+            {
+                value.map(e => <li className="table-list-item" style={{backgroundColor:businessStateMap[e.state]}}>e.number</li>)
+            }
+        </ul>
+    }
+];
+
+const trunk = [
+    {
+        key: "netunitName",
+        dataIndex: "netunitName",
+        title: "网元"
+    },
+    {
+        key: "number",
+        dataIndex: "number",
+        title: "本地号码"
+    },
+    {
+        key: "typeText",
+        dataIndex: "typeText",
+        title: "类型"
+    },
+    {
+        key: "shoreNumber",
+        dataIndex: "shoreNumber",
+        title: "岸上号码"
+    },
+    {
+        key: "shoreState",
+        dataIndex: "shoreState",
+        title: "岸上状态"
+    }
+];
+
+const vdr = [
+    {
+        key: "netunitName",
+        dataIndex: "netunitName",
+        title: "网元"
+    },
+    {
+        key: "vdr",
+        dataIndex: "vdr",
+        title: "号码"
+    },
+    {
+        key: "user",
+        dataIndex: "user",
+        title: "用户",
+        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>value.number</span>
+    }
+];
+
+export const businessColumns = {
+    0: [],
+    2: tongling,
+    3: meeting,
+    4: threetalk,
+    5: trunk,
+    6: trunk,
+    7: broadcast,
+    9: vdr,
+    10: p2p
+};
+
+export const recordColumns = [
+    {
+        key: "callingNumber",
+        title: "主叫号码",
+        dataIndex: "callingNumber",
+        width: 120
+    },
+    {
+        key: "calledNumber",
+        title: "被叫号码",
+        dataIndex: "calledNumber",
+        width: 120
+    },
+    {
+        key: "startTime",
+        title: "录音开始时间",
+        dataIndex: "startTime",
+        width: 150
+    },
+    {
+        key: "period",
+        title: "时长",
+        dataIndex: "period",
+        width: 80
+    }
+];

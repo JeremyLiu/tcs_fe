@@ -6,7 +6,8 @@ import NetworkStatusBar, {STATUS_UNKNOWN,statusColor} from '../component/network
 import SwitchView from '../../common/component/switchview.js'
 import {open_card_dialog} from '../../action/network.js'
 import {refresh_config, get_card_list} from '../../action/config.js'
-import {fetch_net_state,close_card_dialog} from '../../action/network.js'
+import {set_timer, fetch_net_state, close_card_dialog} from '../../action/network.js'
+import {REFRESH_INTERVAL} from '../../constant/model.js'
 
 var NetworkMonitor = React.createClass({
 
@@ -43,7 +44,15 @@ var NetworkMonitor = React.createClass({
                     <button style={{display:this.props.active == 0?'none':'inline-block',
                                     marginLeft: 40}}
                             className="btn btn-default left-float"
-                            onClick={() => this.props.dispatch(close_card_dialog())}>返回</button>
+                            onClick={() => {
+                                let {dispatch} = this.props;
+                                dispatch(fetch_net_state());
+                                dispatch(set_timer(setInterval(function(){
+                                    dispatch(fetch_net_state());
+                                },REFRESH_INTERVAL)));
+                                dispatch(close_card_dialog())}
+
+                            }>返回</button>
                     <NetworkStatusBar/>
                 </div>
                 <SwitchView active={this.props.active}>

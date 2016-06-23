@@ -101,105 +101,60 @@ webpackJsonp([0],[
 	loggerMiddleware // 一个很便捷的 middleware，用来打印 action 日志
 	));
 
-	var topoTimer;
-	var deviceTimer;
-
-	var mainMenu = [{
-	    label: "系统监视",
-	    value: "0",
-	    children: [{
-	        value: "0-0",
-	        label: "网络监视",
-	        content: _react2.default.createElement(_networkmonitor2.default, null),
-	        listener: function listener(active) {
-	            if (active) {
-	                topoTimer = setInterval(function () {
-	                    store.dispatch((0, _network3.fetch_net_state)());
-	                }, _model.REFRESH_INTERVAL);
-	            } else if (topoTimer) {
-	                clearInterval(topoTimer);
-	            }
-	        }
-	    }, {
-	        value: "0-1",
-	        label: "业务监视",
-	        content: _react2.default.createElement(_businessmonitor2.default, null)
-	    }, {
-	        value: "0-2",
-	        label: "设备监视",
-	        content: _react2.default.createElement(_devicemonitor2.default, null),
-	        listener: function listener(active) {
-	            if (active) {
-	                deviceTimer = setInterval(function () {
-	                    store.dispatch((0, _network3.fetch_device_state)());
-	                }, _model.REFRESH_INTERVAL);
-	            } else if (deviceTimer) clearInterval(deviceTimer);
-	        }
-	    }]
-	}, {
-	    label: "系统配置",
-	    value: "1",
-	    children: [{
-	        value: "1-0",
-	        label: "网络配置",
-	        content: _react2.default.createElement(_network2.default, null)
-	    }, {
-	        value: "1-1",
-	        label: "设备配置",
-	        content: _react2.default.createElement(_device2.default, null)
-	    }, {
-	        value: "1-2",
-	        label: "数字中继",
-	        content: _react2.default.createElement(_digitaltrunk2.default, null)
-	    }]
-	}, {
-	    value: "2",
-	    label: "录音软件",
-	    content: _react2.default.createElement(_index4.default, null)
-	}, {
-	    value: "3",
-	    label: "系统日志",
-	    content: _react2.default.createElement(_index6.default, null)
-	}, {
-	    value: "4",
-	    label: "系统管理",
-	    children: [{
-	        value: "4-0",
-	        label: "用户管理",
-	        content: _react2.default.createElement(_user2.default, null)
-	    }, {
-	        value: "4-1",
-	        label: "角色管理"
-	    }, {
-	        value: "4-2",
-	        label: "修改密码"
-	    }]
-	}];
-
 	var func = [{
 	    path: [0, 0],
 	    content: _react2.default.createElement(_networkmonitor2.default, null),
 	    listener: function listener(active) {
 	        if (active) {
-	            topoTimer = setInterval(function () {
+	            var state = store.getState();
+	            if (state.ui.card.visible) {
+	                (function () {
+	                    var netunit = state.ui.card.netunit.id;
+	                    store.dispatch((0, _network3.fetch_card_state)(netunit));
+	                    store.dispatch((0, _network3.set_timer)(setInterval(function () {
+	                        store.dispatch((0, _network3.fetch_card_state)(netunit));
+	                    }, _model.REFRESH_INTERVAL)));
+	                })();
+	            } else {
 	                store.dispatch((0, _network3.fetch_net_state)());
-	            }, _model.REFRESH_INTERVAL);
-	        } else if (topoTimer) {
-	            clearInterval(topoTimer);
+	                store.dispatch((0, _network3.set_timer)(setInterval(function () {
+	                    store.dispatch((0, _network3.fetch_net_state)());
+	                }, _model.REFRESH_INTERVAL)));
+	            }
 	        }
 	    }
 	}, {
 	    path: [0, 1],
-	    content: _react2.default.createElement(_businessmonitor2.default, null)
+	    content: _react2.default.createElement(_businessmonitor2.default, null),
+	    listener: function listener(active) {
+	        if (active) {
+	            (function () {
+	                var state = store.getState();
+	                if (state.business.visible) {
+	                    store.dispatch((0, _network3.fetch_business_data)(state.business.curDetail));
+	                    store.dispatch((0, _network3.set_timer)(setInterval(function () {
+	                        store.dispatch((0, _network3.fetch_business_data)(state.business.curDetail));
+	                    }, _model.REFRESH_INTERVAL)));
+	                } else {
+	                    store.dispatch((0, _network3.fetch_business)());
+	                    store.dispatch((0, _network3.set_timer)(setInterval(function () {
+	                        store.dispatch((0, _network3.fetch_business)());
+	                    }, _model.REFRESH_INTERVAL)));
+	                }
+	            })();
+	        }
+	    }
 	}, {
 	    path: [0, 2],
 	    content: _react2.default.createElement(_devicemonitor2.default, null),
 	    listener: function listener(active) {
 	        if (active) {
-	            deviceTimer = setInterval(function () {
+	            store.dispatch((0, _network3.fetch_device_state)());
+	            var deviceTimer = setInterval(function () {
 	                store.dispatch((0, _network3.fetch_device_state)());
 	            }, _model.REFRESH_INTERVAL);
-	        } else if (deviceTimer) clearInterval(deviceTimer);
+	            store.dispatch((0, _network3.set_timer)(deviceTimer));
+	        }
 	    }
 	}, {
 	    path: [1, 0],
@@ -215,7 +170,15 @@ webpackJsonp([0],[
 	    content: _react2.default.createElement(_user2.default, null)
 	}, {
 	    path: [2],
-	    content: _react2.default.createElement(_index4.default, null)
+	    content: _react2.default.createElement(_index4.default, null),
+	    listener: function listener(active) {
+	        if (active) {
+	            store.dispatch((0, _network3.refresh_recording_data)());
+	            store.dispatch((0, _network3.set_timer)(setInterval(function () {
+	                store.dispatch((0, _network3.refresh_recording_data)());
+	            }, _model.REFRESH_INTERVAL)));
+	        }
+	    }
 	}, {
 	    path: [3],
 	    content: _react2.default.createElement(_index6.default, null)
@@ -18246,6 +18209,9 @@ webpackJsonp([0],[
 	    deviceConfig: _config.deviceConfig,
 	    devicePort: _config.devicePort,
 	    deviceState: _network.deviceState,
+	    business: _network.business,
+	    timer: _network.timer,
+	    record: _network.record,
 	    user: _user2.default
 	});
 
@@ -19625,6 +19591,12 @@ webpackJsonp([0],[
 	var MODIFY_DEVICE_PORT = exports.MODIFY_DEVICE_PORT = "device/port/modify";
 	var REMOVE_DEVICE_PORT = exports.REMOVE_DEVICE_PORT = "device/port/remove";
 
+	var GET_BUSINESS = exports.GET_BUSINESS = 'business';
+	var GET_BUSISNESS_DATA = exports.GET_BUSISNESS_DATA = 'business/list';
+	var GET_RECORD_ALL = exports.GET_RECORD_ALL = 'business/record/all';
+	var GET_RECORDING = exports.GET_RECORDING = 'business/record/current';
+	var GET_RECORD_HISTORY = exports.GET_RECORD_HISTORY = 'business/record/history';
+
 	var GET_ALL_ROLE = exports.GET_ALL_ROLE = "user/roles";
 	var ADD_ROLE = exports.ADD_ROLE = "user/role/create";
 	var REMOVE_ROLE = exports.REMOVE_ROLE = "user/role/remove";
@@ -19676,12 +19648,19 @@ webpackJsonp([0],[
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.REFRESH_DEVICE_STATE = exports.SET_CARD_STATE = exports.REFRESH_CARD_STATE = exports.REFRESH_NET_STATE = exports.CLOSE_CARD_DIALOG = exports.OPEN_CARD_DIALOG = undefined;
+	exports.CLEAR_TIMER = exports.SET_TIMER = exports.REFRESH_RECORDING_DATA = exports.SET_RECORDING_DATA = exports.SET_RECORD_HISTORY_DATA = exports.REFRESH_BUSINESS_DATA = exports.SET_BUSINESS = exports.REFRESH_DEVICE_STATE = exports.SET_CARD_STATE = exports.REFRESH_CARD_STATE = exports.REFRESH_NET_STATE = exports.CLOSE_CARD_DIALOG = exports.OPEN_CARD_DIALOG = undefined;
+	exports.set_timer = set_timer;
+	exports.clear_timer = clear_timer;
 	exports.open_card_dialog = open_card_dialog;
 	exports.close_card_dialog = close_card_dialog;
 	exports.fetch_net_state = fetch_net_state;
 	exports.fetch_card_state = fetch_card_state;
 	exports.fetch_device_state = fetch_device_state;
+	exports.fetch_business = fetch_business;
+	exports.fetch_business_data = fetch_business_data;
+	exports.search_record_data = search_record_data;
+	exports.fetch_record = fetch_record;
+	exports.refresh_recording_data = refresh_recording_data;
 
 	var _isomorphicFetch = __webpack_require__(188);
 
@@ -19704,6 +19683,30 @@ webpackJsonp([0],[
 	var REFRESH_CARD_STATE = exports.REFRESH_CARD_STATE = 'REFRESH_CARD_STATE';
 	var SET_CARD_STATE = exports.SET_CARD_STATE = 'SET_CARD_STATE';
 	var REFRESH_DEVICE_STATE = exports.REFRESH_DEVICE_STATE = 'REFRESH_DEVICE_STATE';
+
+	var SET_BUSINESS = exports.SET_BUSINESS = 'SET_BUSINESS';
+	var REFRESH_BUSINESS_DATA = exports.REFRESH_BUSINESS_DATA = 'REFRESH_BUSINESS_DATA';
+
+	var SET_RECORD_HISTORY_DATA = exports.SET_RECORD_HISTORY_DATA = 'SET_RECORD_HISTORY_DATA';
+	var SET_RECORDING_DATA = exports.SET_RECORDING_DATA = 'SET_RECORDING_DATA';
+	var REFRESH_RECORDING_DATA = exports.REFRESH_RECORDING_DATA = 'REFRESH_RECORDING_DATA';
+
+	var SET_TIMER = exports.SET_TIMER = 'SET_TIMER';
+	var CLEAR_TIMER = exports.CLEAR_TIMER = 'CLEAR_TIMER';
+
+	function set_timer(timer) {
+	    return {
+	        type: SET_TIMER,
+	        timer: timer
+	    };
+	}
+
+	function clear_timer(timer) {
+	    return {
+	        type: CLEAR_TIMER,
+	        timer: timer
+	    };
+	}
 
 	function open_card_dialog(data) {
 	    return {
@@ -19757,6 +19760,78 @@ webpackJsonp([0],[
 	            if (data.status == 0) {
 	                dispatch({
 	                    type: REFRESH_DEVICE_STATE,
+	                    data: data.data
+	                });
+	            }
+	        });
+	    };
+	}
+
+	function fetch_business() {
+	    return function (dispatch) {
+	        return (0, _isomorphicFetch2.default)(API.GET_BUSINESS).then(_response.response).then(function (data) {
+	            if (data.status == 0) dispatch({
+	                type: SET_BUSINESS,
+	                data: data.data
+	            });
+	        });
+	    };
+	}
+
+	function fetch_business_data(type) {
+	    var url = API.GET_BUSISNESS_DATA + "?type=" + type;
+	    return function (dispatch) {
+	        return (0, _isomorphicFetch2.default)(url).then(_response.response).then(function (data) {
+	            if (data.status == 0) {
+	                dispatch({
+	                    type: REFRESH_BUSINESS_DATA,
+	                    data: data.data,
+	                    detail: type
+	                });
+	            }
+	        });
+	    };
+	}
+
+	function search_record_data() {
+	    var startDate = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+	    var endDate = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
+	    var search = arguments.length <= 2 || arguments[2] === undefined ? '' : arguments[2];
+	    var page = arguments.length <= 3 || arguments[3] === undefined ? 1 : arguments[3];
+
+	    var url = API.GET_RECORD_HISTORY + "?startDate=" + startDate + "&endDate=" + endDate + "&search=" + search + "&page=" + page;
+	    return function (dispatch) {
+	        return (0, _isomorphicFetch2.default)(url).then(_response.response).then(function (data) {
+	            if (data.status == 0) {
+	                dispatch({
+	                    type: SET_RECORD_HISTORY_DATA,
+	                    data: data.data
+	                });
+	            }
+	        });
+	    };
+	}
+
+	function fetch_record() {
+	    return function (dispatch) {
+	        return (0, _isomorphicFetch2.default)(API.GET_RECORD_ALL).then(_response.response).then(function (data) {
+	            if (data.status == 0) {
+	                dispatch({
+	                    type: SET_RECORDING_DATA,
+	                    history: data.data.history,
+	                    current: data.data.current
+	                });
+	            }
+	        });
+	    };
+	}
+
+	function refresh_recording_data() {
+	    return function (dispatch) {
+	        return (0, _isomorphicFetch2.default)(API.GET_RECORDING).then(_response.response).then(function (data) {
+	            if (data.status == 0) {
+	                dispatch({
+	                    type: REFRESH_RECORDING_DATA,
 	                    data: data.data
 	                });
 	            }
@@ -20217,6 +20292,9 @@ webpackJsonp([0],[
 	});
 	exports.topoState = topoState;
 	exports.deviceState = deviceState;
+	exports.business = business;
+	exports.record = record;
+	exports.timer = timer;
 
 	var _redux = __webpack_require__(170);
 
@@ -20234,6 +20312,19 @@ webpackJsonp([0],[
 
 	var initUIState = {
 	    isOpenCardDialog: false
+	};
+
+	var initBusiness = {
+	    detail: [],
+	    brief: [],
+	    visible: false,
+	    curDetail: 0
+	};
+
+	var initRecord = {
+	    current: [],
+	    history: [],
+	    totalPage: 1
 	};
 
 	function cardConfig() {
@@ -20284,6 +20375,63 @@ webpackJsonp([0],[
 	        default:
 	            return state;
 	    }
+	}
+
+	function business() {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? initBusiness : arguments[0];
+	    var action = arguments[1];
+
+	    switch (action.type) {
+	        case Action.REFRESH_BUSINESS_DATA:
+	            return Object.assign({}, state, {
+	                visible: true,
+	                detail: action.data,
+	                curDetail: action.detail
+	            });
+	        case Action.SET_BUSINESS:
+	            return Object.assign({}, state, {
+	                visible: false,
+	                brief: action.data
+	            });
+	        default:
+	            return state;
+	    }
+	}
+	function record() {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? initRecord : arguments[0];
+	    var action = arguments[1];
+
+	    switch (action.type) {
+	        case Action.SET_RECORD_HISTORY_DATA:
+	            return Object.assign({}, state, {
+	                history: action.data
+	            });
+	        case Action.REFRESH_RECORDING_DATA:
+	            return Object.assign({}, state, {
+	                current: action.data
+	            });
+	        case Action.SET_RECORDING_DATA:
+	            return Object.assign({}, state, {
+	                current: action.current,
+	                history: action.history
+	            });
+	        default:
+	            return state;
+	    }
+	}
+
+	function timer() {
+	    var state = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	    var action = arguments[1];
+
+	    switch (action.type) {
+	        case Action.SET_TIMER:
+	            clearInterval(state);
+	            return action.timer;
+	        case Action.CLEAR_TIMER:
+	            clearInterval(state);
+	    }
+	    return state;
 	}
 
 	exports.default = networkReducer;
@@ -28816,6 +28964,8 @@ webpackJsonp([0],[
 
 	var _config = __webpack_require__(187);
 
+	var _model = __webpack_require__(286);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var NetworkMonitor = _react2.default.createClass({
@@ -28859,7 +29009,13 @@ webpackJsonp([0],[
 	                            marginLeft: 40 },
 	                        className: 'btn btn-default left-float',
 	                        onClick: function onClick() {
-	                            return _this2.props.dispatch((0, _network.close_card_dialog)());
+	                            var dispatch = _this2.props.dispatch;
+
+	                            dispatch((0, _network.fetch_net_state)());
+	                            dispatch((0, _network.set_timer)(setInterval(function () {
+	                                dispatch((0, _network.fetch_net_state)());
+	                            }, _model.REFRESH_INTERVAL)));
+	                            dispatch((0, _network.close_card_dialog)());
 	                        } },
 	                    '返回'
 	                ),
@@ -29238,9 +29394,14 @@ webpackJsonp([0],[
 	    },
 	    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
 	        var id = nextProps.netunit.id;
-	        if (nextProps.visible && !this.props.visible) this.timer = setInterval(function () {
-	            this.props.dispatch((0, _network.fetch_card_state)(id));
-	        }.bind(this), _model.REFRESH_INTERVAL);else if (!nextProps.visible && this.props.visible) clearInterval(this.timer);
+	        var dispatch = this.props.dispatch;
+
+	        if (nextProps.visible && !this.props.visible) {
+	            dispatch((0, _network.fetch_card_state)(id));
+	            dispatch((0, _network.set_timer)(setInterval(function () {
+	                dispatch((0, _network.fetch_card_state)(id));
+	            }, _model.REFRESH_INTERVAL)));
+	        }
 	    },
 	    getSelect: function getSelect() {
 	        if (this.props.state.length > 0) return this.props.state[this.state.select].portState.map(function (s, index) {
@@ -29534,6 +29695,8 @@ webpackJsonp([0],[
 	    value: true
 	});
 	exports.rangeArray = rangeArray;
+	exports.dateFormat = dateFormat;
+	exports.getTimeStr = getTimeStr;
 	var TOPO_PHYSIC = exports.TOPO_PHYSIC = "physic";
 	var TOPO_TREE = exports.TOPO_TREE = "tree";
 	var TOPO_STAR = exports.TOPO_STAR = "star";
@@ -29550,7 +29713,7 @@ webpackJsonp([0],[
 	}];
 
 	var OP_CARD_TYPE = exports.OP_CARD_TYPE = 10;
-	var REFRESH_INTERVAL = exports.REFRESH_INTERVAL = 5000;
+	var REFRESH_INTERVAL = exports.REFRESH_INTERVAL = 2000;
 
 	var deviceMenu = exports.deviceMenu = [{
 	    key: 'modify',
@@ -29685,11 +29848,319 @@ webpackJsonp([0],[
 	    }]
 	}];
 
+	var businessBriefColumn = exports.businessBriefColumn = [{
+	    key: "id",
+	    title: "序号",
+	    dataIndex: "id",
+	    width: 50
+	}, {
+	    key: "name",
+	    title: "业务名称",
+	    dataIndex: "name",
+	    width: 200
+	}, {
+	    key: "img",
+	    title: "业务类型",
+	    dataIndex: "img",
+	    width: 200,
+	    render: function render(value, row, index) {
+	        return React.createElement("img", { src: value });
+	    }
+	}, {
+	    key: "count",
+	    dataIndex: "count",
+	    title: "数量",
+	    width: 80
+	}];
+
 	function rangeArray(start, end) {
 	    return Array(end - start + 1).fill(0).map(function (v, i) {
 	        return i + start;
 	    });
 	}
+
+	function dateFormat(timestamp) {
+	    var date = new Date(timestamp);
+	    return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+	}
+
+	function getTimeStr(time) {
+	    if (time < 1000) return time / 1000 + '秒';else time = time / 1000;
+	    var result = '';
+	    var timeSpan = [{
+	        span: 1,
+	        text: '秒'
+	    }, {
+	        span: 60,
+	        text: '分'
+	    }, {
+	        span: 3600,
+	        text: '小时'
+	    }, {
+	        span: 24 * 3600,
+	        text: '天'
+	    }, {
+	        span: 24 * 3600 * 365,
+	        text: '年'
+	    }];
+
+	    timeSpan.forEach(function (e) {
+	        if (time >= e.span) {
+	            result += Math.floor(time / e.span) + e.text;
+	            time = time % e.span;
+	        }
+	    });
+	    return result;
+	}
+
+	var businessStateMap = {
+	    0: "green",
+	    1: "grey"
+	};
+
+	var tongling = [{
+	    key: "netunitName",
+	    dataIndex: "netunitName",
+	    title: "网元"
+	}, {
+	    key: "number",
+	    dataIndex: "number",
+	    title: "号码",
+	    width: "150"
+	}, {
+	    key: "chairman",
+	    dataIndex: "chairman",
+	    title: "主席"
+	}, {
+	    key: "superior",
+	    dataIndex: "superior",
+	    title: "长官"
+	}, {
+	    key: "name",
+	    dataIndex: "name",
+	    title: "名称"
+	}, {
+	    key: "commander",
+	    dataIndex: "commander",
+	    title: "指挥"
+	}, {
+	    key: "member",
+	    dataIndex: "member",
+	    title: "成员",
+	    render: function render(value, row, index) {
+	        return React.createElement(
+	            "ul",
+	            { className: "table-list" },
+	            value.map(function (e) {
+	                return React.createElement(
+	                    "li",
+	                    { className: "table-list-item", style: { backgroundColor: businessStateMap[e.state] } },
+	                    "e.number"
+	                );
+	            })
+	        );
+	    }
+	}];
+
+	var p2p = [{
+	    key: "netunitName",
+	    dataIndex: "netunitName",
+	    title: "网元"
+	}, {
+	    key: "caller",
+	    dataIndex: "caller",
+	    title: "主叫号码"
+	}, {
+	    key: "second",
+	    dataIndex: "second",
+	    title: "被叫号码",
+	    render: function render(value, row, index) {
+	        return React.createElement(
+	            "span",
+	            { className: "table-list-item", style: { backgroundColor: businessStateMap[value.state] } },
+	            "value.number"
+	        );
+	    }
+	}];
+
+	var meeting = [{
+	    key: "netunitName",
+	    dataIndex: "netunitName",
+	    title: "网元"
+	}, {
+	    key: "number",
+	    dataIndex: "number",
+	    title: "号码"
+	}, {
+	    key: "name",
+	    dataIndex: "name",
+	    title: "名称"
+	}, {
+	    key: "caller",
+	    dataIndex: "caller",
+	    title: "主叫号码"
+	}, {
+	    key: "member",
+	    dataIndex: "member",
+	    title: "成员",
+	    render: function render(value, row, index) {
+	        return React.createElement(
+	            "ul",
+	            { className: "table-list" },
+	            value.map(function (e) {
+	                return React.createElement(
+	                    "li",
+	                    { className: "table-list-item", style: { backgroundColor: businessStateMap[e.state] } },
+	                    "e.number"
+	                );
+	            })
+	        );
+	    }
+	}];
+
+	var threetalk = [{
+	    key: "netunitName",
+	    dataIndex: "netunitName",
+	    title: "网元"
+	}, {
+	    key: "caller",
+	    dataIndex: "caller",
+	    title: "主叫号码"
+	}, {
+	    key: "second",
+	    dataIndex: "second",
+	    title: "被叫号码1",
+	    render: function render(value, row, index) {
+	        return React.createElement(
+	            "span",
+	            { className: "table-list-item", style: { backgroundColor: businessStateMap[value.state] } },
+	            "value.number"
+	        );
+	    }
+	}, {
+	    key: "third",
+	    dataIndex: "third",
+	    title: "被叫号码2",
+	    render: function render(value, row, index) {
+	        return React.createElement(
+	            "span",
+	            { className: "table-list-item", style: { backgroundColor: businessStateMap[value.state] } },
+	            "value.number"
+	        );
+	    }
+	}];
+
+	var broadcast = [{
+	    key: "netunitName",
+	    dataIndex: "netunitName",
+	    title: "网元"
+	}, {
+	    key: "number",
+	    dataIndex: "number",
+	    title: "号码"
+	}, {
+	    key: "device",
+	    dataIndex: "device",
+	    title: ""
+	}, {
+	    key: "name",
+	    dataIndex: "name",
+	    title: "名称"
+	}, {
+	    key: "member",
+	    dataIndex: "member",
+	    title: "成员",
+	    render: function render(value, row, index) {
+	        return React.createElement(
+	            "ul",
+	            { className: "table-list" },
+	            value.map(function (e) {
+	                return React.createElement(
+	                    "li",
+	                    { className: "table-list-item", style: { backgroundColor: businessStateMap[e.state] } },
+	                    "e.number"
+	                );
+	            })
+	        );
+	    }
+	}];
+
+	var trunk = [{
+	    key: "netunitName",
+	    dataIndex: "netunitName",
+	    title: "网元"
+	}, {
+	    key: "number",
+	    dataIndex: "number",
+	    title: "本地号码"
+	}, {
+	    key: "typeText",
+	    dataIndex: "typeText",
+	    title: "类型"
+	}, {
+	    key: "shoreNumber",
+	    dataIndex: "shoreNumber",
+	    title: "岸上号码"
+	}, {
+	    key: "shoreState",
+	    dataIndex: "shoreState",
+	    title: "岸上状态"
+	}];
+
+	var vdr = [{
+	    key: "netunitName",
+	    dataIndex: "netunitName",
+	    title: "网元"
+	}, {
+	    key: "vdr",
+	    dataIndex: "vdr",
+	    title: "号码"
+	}, {
+	    key: "user",
+	    dataIndex: "user",
+	    title: "用户",
+	    render: function render(value, row, index) {
+	        return React.createElement(
+	            "span",
+	            { className: "table-list-item", style: { backgroundColor: businessStateMap[value.state] } },
+	            "value.number"
+	        );
+	    }
+	}];
+
+	var businessColumns = exports.businessColumns = {
+	    0: [],
+	    2: tongling,
+	    3: meeting,
+	    4: threetalk,
+	    5: trunk,
+	    6: trunk,
+	    7: broadcast,
+	    9: vdr,
+	    10: p2p
+	};
+
+	var recordColumns = exports.recordColumns = [{
+	    key: "callingNumber",
+	    title: "主叫号码",
+	    dataIndex: "callingNumber",
+	    width: 120
+	}, {
+	    key: "calledNumber",
+	    title: "被叫号码",
+	    dataIndex: "calledNumber",
+	    width: 120
+	}, {
+	    key: "startTime",
+	    title: "录音开始时间",
+	    dataIndex: "startTime",
+	    width: 150
+	}, {
+	    key: "period",
+	    title: "时长",
+	    dataIndex: "period",
+	    width: 80
+	}];
 
 /***/ },
 /* 287 */
@@ -30576,6 +31047,14 @@ webpackJsonp([0],[
 
 	__webpack_require__(282);
 
+	var _switchview = __webpack_require__(229);
+
+	var _switchview2 = _interopRequireDefault(_switchview);
+
+	var _model = __webpack_require__(286);
+
+	var _network = __webpack_require__(192);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var columns = [{
@@ -30619,21 +31098,66 @@ webpackJsonp([0],[
 
 	var BusinessMonitor = _react2.default.createClass({
 	    displayName: 'BusinessMonitor',
+	    switchView: function switchView(record) {
+	        var dispatch = this.props.dispatch;
+
+	        dispatch((0, _network.fetch_busisness_data)(record.type));
+	    },
 	    render: function render() {
-	        return _react2.default.createElement(_rcTable2.default, { className: 'table table-bordered compact-3',
-	            columns: columns,
-	            data: data,
-	            style: {
-	                width: 600
-	            } });
+	        var _this = this;
+
+	        return _react2.default.createElement(
+	            'div',
+	            null,
+	            _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'button',
+	                    { style: { display: this.props.visible ? 'inline-block' : 'none',
+	                            marginLeft: 40 },
+	                        className: 'btn btn-default left-float',
+	                        onClick: function onClick() {
+	                            return _this.props.dispatch((0, _network.fetch_business)());
+	                        } },
+	                    '返回'
+	                )
+	            ),
+	            _react2.default.createElement(
+	                _switchview2.default,
+	                { active: this.props.visible ? 1 : 0 },
+	                _react2.default.createElement(_rcTable2.default, { className: 'table table-bordered compact-3',
+	                    columns: _model.businessBriefColumn,
+	                    data: this.props.brief.map(function (e, index) {
+	                        return Object.assign({}, e, { key: index });
+	                    }),
+	                    style: {
+	                        width: 600
+	                    },
+	                    onRowClick: this.switchView
+	                }),
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    _react2.default.createElement(_rcTable2.default, { className: 'table table-bordered compact-3',
+	                        columns: _model.businessColumns[this.props.curDetail],
+	                        data: this.props.detail.map(function (e, index) {
+	                            return Object.assign({}, e, { key: index });
+	                        }),
+	                        style: {
+	                            width: 600
+	                        } })
+	                )
+	            )
+	        );
 	    }
 	});
 
 	function stateMap(state) {
-	    return state.sysMonitor.businessRecord;
+	    return state.business;
 	}
 
-	exports.default = (0, _reactRedux.connect)()(BusinessMonitor);
+	exports.default = (0, _reactRedux.connect)(stateMap)(BusinessMonitor);
 
 /***/ },
 /* 292 */
@@ -30773,39 +31297,15 @@ webpackJsonp([0],[
 
 	var _rcTable2 = _interopRequireDefault(_rcTable);
 
+	var _reactRedux = __webpack_require__(198);
+
+	var _model = __webpack_require__(286);
+
+	var _network = __webpack_require__(192);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var columns = [{
-	    render: function render() {
-	        return _react2.default.createElement('input', { type: 'checkbox' });
-	    },
-	    width: 30
-	}, {
-	    key: "id",
-	    title: "序号",
-	    dataIndex: "id",
-	    width: 40
-	}, {
-	    key: "calling_number",
-	    title: "主叫号码",
-	    dataIndex: "calling_number",
-	    width: 120
-	}, {
-	    key: "called_number",
-	    title: "被叫号码",
-	    dataIndex: "called_number",
-	    width: 120
-	}, {
-	    key: "create_time",
-	    title: "录音开始时间",
-	    dataIndex: "create_time",
-	    width: 150
-	}, {
-	    key: "time",
-	    title: "时长",
-	    dataIndex: "time",
-	    width: 80
-	}];
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	var data = [{
 	    key: 1,
@@ -30825,8 +31325,11 @@ webpackJsonp([0],[
 
 	var Record = _react2.default.createClass({
 	    displayName: 'Record',
+	    componentWillMount: function componentWillMount() {
+	        this.props.dispatch((0, _network.fetch_record)());
+	    },
 	    componentDidMount: function componentDidMount() {
-	        $('.form-date').datepicker({
+	        $('input.form-date').datepicker({
 	            format: "yyyy-mm-dd",
 	            language: "zh-CN",
 	            autoclose: true,
@@ -30839,63 +31342,61 @@ webpackJsonp([0],[
 	            'div',
 	            null,
 	            _react2.default.createElement(
-	                'div',
-	                { className: 'row', style: { marginLeft: 30 } },
+	                'form',
+	                { className: 'form-inline', style: { marginLeft: 30 } },
 	                _react2.default.createElement(
 	                    'div',
-	                    { className: 'select-group' },
+	                    { className: 'form-group' },
 	                    _react2.default.createElement(
 	                        'label',
-	                        { className: 'label-text' },
+	                        null,
 	                        '日期范围：'
 	                    ),
+	                    _react2.default.createElement('input', { type: 'text', readonly: 'readonly', maxlength: '20',
+	                        className: 'form-control form-date compact-inline',
+	                        defautValue: '' }),
 	                    _react2.default.createElement(
-	                        'div',
-	                        { className: '' },
-	                        _react2.default.createElement('input', { type: 'text', readonly: 'readonly', maxlength: '20', className: 'n_input_text form-date',
-	                            defautValue: '' }),
-	                        _react2.default.createElement(
-	                            'span',
-	                            { className: 'label-text' },
-	                            '至'
-	                        ),
-	                        _react2.default.createElement('input', { type: 'text', readonly: 'readonly', maxlength: '20', className: 'n_input_text form-date',
-	                            defautValue: '' })
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'select-group' },
-	                    _react2.default.createElement('input', { type: 'text', className: 'n_input_text', placeholder: '输入主叫/被叫号码查询' }),
-	                    _react2.default.createElement(
-	                        'button',
-	                        { type: 'button', className: 'btn btn-default', style: { float: "left" } },
-	                        '搜索'
-	                    )
-	                ),
-	                _react2.default.createElement(
-	                    'div',
-	                    { className: 'select-group' },
-	                    _react2.default.createElement(
-	                        'button',
-	                        { className: 'btn btn-default' },
-	                        '删除'
+	                        'label',
+	                        null,
+	                        '至'
 	                    ),
-	                    _react2.default.createElement(
-	                        'button',
-	                        { className: 'btn btn-default' },
-	                        '录音'
-	                    )
+	                    _react2.default.createElement('input', { type: 'text', readonly: 'readonly', maxlength: '20',
+	                        className: 'form-control form-date compact-inline',
+	                        defautValue: '' })
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'form-group' },
+	                    _react2.default.createElement('input', { type: 'text', className: 'form-control compact-inline', placeholder: '输入主叫/被叫号码查询' })
+	                ),
+	                _react2.default.createElement(
+	                    'button',
+	                    { type: 'button', className: 'btn btn-default' },
+	                    '查询'
 	                )
 	            ),
 	            _react2.default.createElement(_rcTable2.default, { className: 'table table-bordered compact-3',
-	                columns: columns,
-	                data: data })
+	                columns: _model.recordColumns,
+	                data: [].concat(_toConsumableArray(this.props.current), _toConsumableArray(this.props.history)), style: { width: '80%' } })
 	        );
 	    }
 	});
 
-	exports.default = Record;
+	function stateMap(state) {
+	    var itemMap = function itemMap(e, index) {
+	        return Object.assign({}, e, {
+	            key: index,
+	            startTime: (0, _model.dateFormat)(e.startTime),
+	            period: (0, _model.getTimeStr)(e.period)
+	        });
+	    };
+	    return {
+	        current: state.record.current.map(itemMap),
+	        history: state.record.history.map(itemMap)
+	    };
+	}
+
+	exports.default = (0, _reactRedux.connect)(stateMap)(Record);
 
 /***/ },
 /* 294 */

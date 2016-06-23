@@ -3,7 +3,7 @@ import ui from './ui.js'
 import user from './user.js'
 import constant from './constant.js'
 import {netUnitConfig,deviceConfig, devicePort} from './config.js'
-import {topoState, deviceState} from './network.js'
+import {topoState, deviceState, business, timer, record} from './network.js'
 
 export default combineReducers({
     ui,
@@ -13,5 +13,8 @@ export default combineReducers({
     deviceConfig,
     devicePort,
     deviceState,
+    business,
+    timer,
+    record,
     user
 });

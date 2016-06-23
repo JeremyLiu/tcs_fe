@@ -20,7 +20,10 @@ import DeviceList from './config/container/device.js'
 import UserManage from './sysmanage/user.js'
 import RoleManage from './sysmanage/role.js'
 import {get_all_card_type} from './action/config.js'
-import {fetch_net_state, fetch_device_state} from './action/network.js'
+import {fetch_net_state, fetch_device_state,
+    fetch_card_state, set_timer,
+    fetch_business, fetch_business_data,
+    refresh_recording_data} from './action/network.js'
 import {get_all_role} from './action/user.js'
 import {REFRESH_INTERVAL} from './constant/model.js'
 import ConfirmDialog from './common/container/confirmdialog.js'
@@ -32,129 +35,59 @@ const store = createStore(rootReducer,  applyMiddleware(
     loggerMiddleware // 一个很便捷的 middleware，用来打印 action 日志
 ));
 
-var topoTimer;
-var deviceTimer;
-
-let mainMenu = [
-    {
-        label:"系统监视",
-        value: "0",
-        children:[
-            {
-                value: "0-0",
-                label: "网络监视",
-                content: <NetworkMonitor/>,
-                listener: (active) => {
-                    if(active){
-                        topoTimer = setInterval(function(){
-                            store.dispatch(fetch_net_state());
-                        },REFRESH_INTERVAL);
-                    }else if(topoTimer){
-                        clearInterval(topoTimer);
-                    }
-                }
-            },
-            {
-                value: "0-1",
-                label: "业务监视",
-                content: <BusinessMonitor/>
-            },
-            {
-                value: "0-2",
-                label: "设备监视",
-                content: <DeviceMonitor/>,
-                listener: (active) => {
-                    if(active){
-                        deviceTimer  = setInterval(function () {
-                            store.dispatch(fetch_device_state());
-                        }, REFRESH_INTERVAL);
-                    }else if(deviceTimer)
-                        clearInterval(deviceTimer);
-                }
-            }
-        ]
-    },
-    {
-        label: "系统配置",
-        value:"1",
-        children: [
-            {
-                value: "1-0",
-                label: "网络配置",
-                content: <NetworkConfig/>
-            },
-            {
-                value: "1-1",
-                label: "设备配置",
-                content: <DeviceList/>
-            },
-            {
-                value: "1-2",
-                label: "数字中继",
-                content: <DigitalTrunk/>
-            }
-        ]
-    },
-    {
-        value: "2",
-        label: "录音软件",
-        content: <Record/>
-    },
-    {
-        value: "3",
-        label: "系统日志",
-        content: <SysLog/>
-    },
-    {
-        value: "4",
-        label: "系统管理",
-        children:[
-            {
-                value: "4-0",
-                label: "用户管理",
-                content: <UserManage/>
-            },
-            {
-                value: "4-1",
-                label: "角色管理"
-            },
-            {
-                value: "4-2",
-                label: "修改密码"
-            }
-        ]
-    }
-
-];
-
 const func = [
     {
         path: [0,0],
         content: <NetworkMonitor/>,
         listener: (active) => {
             if(active){
-                topoTimer = setInterval(function(){
+                let state = store.getState();
+                if(state.ui.card.visible){
+                    let netunit = state.ui.card.netunit.id;
+                    store.dispatch(fetch_card_state(netunit));
+                    store.dispatch(set_timer(setInterval(function () {
+                        store.dispatch(fetch_card_state(netunit));
+                    }, REFRESH_INTERVAL)));
+                }else {
                     store.dispatch(fetch_net_state());
-                },REFRESH_INTERVAL);
-            }else if(topoTimer){
-                clearInterval(topoTimer);
+                    store.dispatch(set_timer(setInterval(function () {
+                        store.dispatch(fetch_net_state());
+                    }, REFRESH_INTERVAL)));
+                }
             }
         }
     },
     {
         path: [0,1],
-        content: <BusinessMonitor/>
+        content: <BusinessMonitor/>,
+        listener: (active) => {
+            if(active){
+                let state = store.getState();
+                if(state.business.visible){
+                    store.dispatch(fetch_business_data(state.business.curDetail));
+                    store.dispatch(set_timer(setInterval(function () {
+                        store.dispatch(fetch_business_data(state.business.curDetail));
+                    }, REFRESH_INTERVAL)));
+                }else{
+                    store.dispatch(fetch_business());
+                    store.dispatch(set_timer(setInterval(function () {
+                        store.dispatch(fetch_business());
+                    }, REFRESH_INTERVAL)));
+                }
+            }
+        }
     },
     {
         path: [0,2],
         content: <DeviceMonitor/>,
         listener: (active) => {
             if(active){
-                deviceTimer  = setInterval(function () {
+                store.dispatch(fetch_device_state());
+                let deviceTimer  = setInterval(function () {
                     store.dispatch(fetch_device_state());
                 }, REFRESH_INTERVAL);
-            }else if(deviceTimer)
-                clearInterval(deviceTimer);
+                store.dispatch(set_timer(deviceTimer));
+            }
         }
     },
     {
@@ -175,7 +108,15 @@ const func = [
     },
     {
         path: [2],
-        content: <Record/>
+        content: <Record/>,
+        listener: (active) => {
+            if(active) {
+                store.dispatch(refresh_recording_data());
+                store.dispatch(set_timer(setInterval(function () {
+                    store.dispatch(refresh_recording_data());
+                }, REFRESH_INTERVAL)));
+            }
+        }
     },
     {
         path: [3],
