@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch'
 import * as API from '../constant/api.js'
-import {response} from './response.js'
+import {response, set_error_text} from './response.js'
 
 //拓扑相关
 export const ADD_ELEMENT = 'RECIEVE_ADD_ELEMENT';
@@ -129,7 +129,9 @@ export function open_confirm_dialog(title, text, confirm){
 
 export function fetch_card_slot(netunit, type, callback){
     const url = API.GET_NETUNIT_CARD_SLOT+ "?netunit="+netunit+"&type="+type;
-    return (dispatch) => fetch(url).then(response).then(
+    return (dispatch) => fetch(url,{
+        credentials: "same-origin"
+    }).then(response).then(
         data => {
             if(data.status == 0 && callback)
                 callback(data.data);
@@ -182,8 +184,9 @@ export function close_device_port_dialog(){
 }
 
 export function refresh_config(){
-    return (dispatch) => fetch(API.GET_NET_CONFIG)
-        .then(response)
+    return (dispatch) => fetch(API.GET_NET_CONFIG,{
+        credentials: "same-origin"
+    }).then(response)
         .then(data => {
             if(data.status == 0)
                 dispatch({
@@ -195,7 +198,9 @@ export function refresh_config(){
 
 export function get_card_list(netunit, success){
     const url = API.GET_CARD_CONFIG + '?netUnit=' + netunit.id;
-    return (dispatch) => fetch(url).then(response)
+    return (dispatch) => fetch(url,{
+        credentials: "same-origin"
+    }).then(response)
         .then(data => {
             if(data.status == 0) {
                 let res = {
@@ -214,7 +219,9 @@ export function get_card_list(netunit, success){
 export function get_device(card = 0){
     let actionType = card > 0? SET_CARD_DEVICE: SET_ALL_DEVICE
     const url = API.GET_DEVICE + '?card=' + card;
-    return (dispatch) => fetch(url).then(response)
+    return (dispatch) => fetch(url,{
+        credentials: "same-origin"
+    }).then(response)
         .then(data => {
             if(data.status == 0){
                 dispatch({
@@ -226,7 +233,9 @@ export function get_device(card = 0){
 }
 
 export function get_all_card_type(){
-    return (dispatch) => fetch(API.GET_CARD_TYPE).then(response).
+    return (dispatch) => fetch(API.GET_CARD_TYPE,{
+        credentials: "same-origin"
+    }).then(response).
     then(data => {
         if(data.status == 0){
             let cardTypes = [];
@@ -243,7 +252,9 @@ export function get_all_card_type(){
 
 export function fetch_element(id, callback){
     const url = API.GET_NETUNIT+ "?netunit="+id;
-    return (dispatch) => fetch(url).then(response)
+    return (dispatch) => fetch(url,{
+        credentials: "same-origin"
+    }).then(response)
         .then(data => {
             if(data.status == 0 && callback)
                 callback(data.data);
@@ -251,7 +262,9 @@ export function fetch_element(id, callback){
 }
 
 export function fetch_device(){
-    return (dispatch) => fetch(API.GET_DEVICE).then(response)
+    return (dispatch) => fetch(API.GET_DEVICE,{
+        credentials: "same-origin"
+    }).then(response)
         .then(data => {
             if(data.status == 0)
                 dispatch({
@@ -263,7 +276,9 @@ export function fetch_device(){
 
 export function fetch_device_port(deviceId){
     const url = API.GET_DEVICE_PORT + "?id=" + deviceId;
-    return (dispatch) => fetch(url).then(response)
+    return (dispatch) => fetch(url,{
+        credentials: "same-origin"
+    }).then(response)
         .then(data => {
             if(data.status == 0)
                 dispatch({
@@ -280,6 +295,7 @@ export function post_add_device(netunit, name, netUnitName){
     form.append('name', name);
     return (dispatch) => fetch(API.CREATE_DEVICE,{
         method: 'POST',
+        credentials: "same-origin",
         body: form
     }).then(response)
         .then(data => {
@@ -294,7 +310,8 @@ export function post_add_device(netunit, name, netUnitName){
                 dispatch({
                     type: CLOSE_DEVICE_DIALOG
                 })
-            }
+            }else
+                dispatch(set_error_text(data.message));
         })
 }
 
@@ -305,6 +322,7 @@ export function post_modify_device(id,netunit,name, netUnitName){
     form.append('name', name);
     return (dispatch) => fetch(API.MODIFY_DEVICE,{
         method: 'POST',
+        credentials: "same-origin",
         body: form
     }).then(response)
         .then(data => {
@@ -319,13 +337,15 @@ export function post_modify_device(id,netunit,name, netUnitName){
                 dispatch({
                     type: CLOSE_DEVICE_DIALOG
                 })
-            }
+            }else
+                dispatch(set_error_text(data.message));
         })
 }
 
 export function post_remove_device(id, select){
     const url = API.REMOVE_DEVICE + '?id=' + id;
     return (dispatch) => fetch(url, {
+        credentials: "same-origin",
         method: 'DELETE'
     }).then(response).then(data => {
         if(data.status == 0 && data.data){
@@ -351,6 +371,7 @@ export function post_add_device_port(id,deviceId,name){
     form.append('function', name);
     return (dispatch) => fetch(API.CREATE_DEVICE_PORT,{
         method: 'POST',
+        credentials: "same-origin",
         body: form
     }).then(response).then(data => {
         if(data.status == 0){
@@ -365,7 +386,8 @@ export function post_add_device_port(id,deviceId,name){
             dispatch({
                 type: CLOSE_DEVICE_PORT_DIALOG
             });
-        }
+        }else
+            dispatch(set_error_text(data.message));
     })
 }
 
@@ -376,6 +398,7 @@ export function post_modify_device_port(id,deviceId,number,name){
     form.append('function', name);
     return (dispatch) => fetch(API.MODIFY_DEVICE_PORT, {
         method: 'POST',
+        credentials: "same-origin",
         body: form
     }).then(response).then(data => {
         if(data.status == 0){
@@ -389,13 +412,15 @@ export function post_modify_device_port(id,deviceId,number,name){
             dispatch({
                 type: CLOSE_DEVICE_PORT_DIALOG
             })
-        }
+        }else
+            dispatch(set_error_text(data.message));
     })
 }
 
 export function post_remove_device_port(id){
     const url = API.REMOVE_DEVICE_PORT + "?id=" + id;
     return (dispatch) => fetch(url, {
+        credentials: "same-origin",
         method: 'DELETE'
     }).then(response).then(data => {
         if(data.status == 0){
@@ -417,6 +442,7 @@ export function add_element(e, callback){
         // headers : {
         //     'Content-Type': 'multipart/form-data'
         // },
+        credentials: "same-origin",
         body: form
     })
         .then(response)
@@ -435,6 +461,7 @@ export function modify_element(e){
     form.append('slot', e.cardCount);
     return (dispatch) => fetch(API.MODIFY_ELEMENT,{
         method: 'POST',
+        credentials: "same-origin",
         body: form
     }).then(response).then(data => {
         if(data.status == 0) {
@@ -442,13 +469,15 @@ export function modify_element(e){
             dispatch({
                 type: CLOSE_ADD_DIALOG
             });
-        }
+        }else
+            dispatch(set_error_text(data.message));
     })
 }
 
 export function remove_element(id){
     const url = API.REMOVE_ELEMENT+ "?id="+id;
     return (dispatch) => fetch(url,{
+        credentials: "same-origin",
         method: 'DELETE'
     }).then(response).then(data => {
         if(data.status == 0){
@@ -470,6 +499,7 @@ export function post_add_connect(src,dest,slot,port){
     form.append('port', port);
     return (dispatch) => fetch(API.ADD_NETUNIT_CONNECT,{
         method: 'POST',
+        credentials: "same-origin",
         body: form
     }).then(response).then(
         data => {
@@ -478,7 +508,8 @@ export function post_add_connect(src,dest,slot,port){
                 dispatch({
                     type: CLOSE_CONNECT_DIALOG
                 });
-            }
+            }else
+                dispatch(set_error_text(data.message));
         }
     )
 }
@@ -491,6 +522,7 @@ export function post_connect(e, callback){
     form.append('port', e.port);
     return (dispatch) => fetch(API.ADD_NETUNIT_CONNECT,{
         method: 'POST',
+        credentials: "same-origin",
         body: form
     }).then(response).then(
         data => callback(data)
@@ -503,6 +535,7 @@ export function post_modify_card_type(id, type, name){
     form.append('type', type);
     return (dispatch) => fetch(API.MODIFY_CARD_CONFIG,{
         method: 'POST',
+        credentials: "same-origin",
         body: form
     }).then(response).then(
         data => {

@@ -1,4 +1,4 @@
-
+import React from 'react'
 export const TOPO_PHYSIC = "physic";
 export const TOPO_TREE = "tree";
 export const TOPO_STAR = "star";
@@ -63,15 +63,26 @@ export const userMenu = [
         key: 'modify',
         text: '修改'
     },
+    // {
+    //     key: 'modifyPassword',
+    //     text: '更换密码'
+    // },
     {
-        key: 'modifyPassword',
-        text: '更换密码'
+        key: 'remove',
+        text: '删除'
+    }
+];
+
+export const recordMenu = [
+    {
+        key: 'play',
+        text: '播放'
     },
     {
         key: 'remove',
         text: '删除'
     }
-]
+];
 
 export const deviceColumns = [
     {
@@ -139,15 +150,15 @@ export const menu = [
         value: "0",
         children:[
             {
-                value: "0-1",
+                value: "0-0",
                 label: "网络监视"
             },
             {
-                value: "0-2",
+                value: "0-1",
                 label: "业务监视"
             },
             {
-                value: "0-3",
+                value: "0-2",
                 label: "设备监视"
             }
         ]
@@ -200,9 +211,9 @@ export const menu = [
 
 export const businessBriefColumn = [
     {
-        key: "id",
+        key: "key",
         title: "序号",
-        dataIndex: "id",
+        dataIndex: "key",
         width: 50
     },
     {
@@ -316,12 +327,12 @@ const tongling = [
         title: "指挥"
     },
     {
-        key: "member",
-        dataIndex: "member",
+        key: "members",
+        dataIndex: "members",
         title: "成员",
         render: (value,row, index) => <ul className="table-list">
             {
-                value.map(e => <li className="table-list-item" style={{backgroundColor:businessStateMap[e.state]}}>e.number</li>)
+                value.map(e => <li className="table-list-item" style={{backgroundColor:businessStateMap[e.state]}}>{e.number}</li>)
             }
         </ul>
     }
@@ -342,7 +353,7 @@ const p2p = [
         key: "second",
         dataIndex: "second",
         title: "被叫号码",
-        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>value.number</span>
+        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>{value.number}</span>
     }
 ];
 
@@ -368,12 +379,12 @@ const meeting = [
         title: "主叫号码"
     },
     {
-        key: "member",
-        dataIndex: "member",
+        key: "members",
+        dataIndex: "members",
         title: "成员",
         render: (value,row, index) => <ul className="table-list">
             {
-                value.map(e => <li className="table-list-item" style={{backgroundColor:businessStateMap[e.state]}}>e.number</li>)
+                value.map(e => <li className="table-list-item" style={{backgroundColor:businessStateMap[e.state]}}>{e.number}</li>)
             }
         </ul>
     }
@@ -394,13 +405,13 @@ const threetalk = [
         key: "second",
         dataIndex: "second",
         title: "被叫号码1",
-        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>value.number</span>
+        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>{value.number}</span>
     },
     {
         key: "third",
         dataIndex: "third",
         title: "被叫号码2",
-        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>value.number</span>
+        render: (value,row,index) => <span className="table-list-item" style={{backgroundColor:businessStateMap[value.state]}}>{value.number}</span>
     }
 ];
 
@@ -426,8 +437,8 @@ const broadcast = [
         title: "名称"
     },
     {
-        key: "member",
-        dataIndex: "member",
+        key: "members",
+        dataIndex: "members",
         title: "成员",
         render: (value,row, index) => <ul className="table-list">
             {
@@ -522,3 +533,36 @@ export const recordColumns = [
         width: 80
     }
 ];
+
+export const logColumns = [
+    {
+        dataIndex: "id",
+        width: 50,
+        render: (value, row, index) => <input type="checkbox" data-id={value}/>
+    },
+    {
+        key: "operator",
+        title: "操作用户",
+        dataIndex: "operator",
+        width: 150
+    },
+    {
+        key: "module",
+        title: "所属模块",
+        dataIndex: "module",
+        width: 120
+    },
+    {
+        key: "description",
+        title: "操作内容",
+        dataIndex: "description",
+        width: 300
+    },
+    {
+        key: "createTime",
+        title: "时间",
+        dataIndex: "createTime",
+
+    }
+]
+

@@ -29,31 +29,31 @@ var ConnectDialog = React.createClass({
     },
 
     render(){
-        return <ConfigDialog width="400"
+        return <ConfigDialog width="350"
                             visible={this.props.visible}
                              cancelAction={{type: Action.CLOSE_CONNECT_DIALOG}}
                              onSave={this.handleSave}
                     title="新建连接">
             <form className="form-horizontal">
                 <div className="form-group">
-                    <label className="label-3">源网元</label>
+                    <label className="label-4">源网元</label>
                     <Combox ref="src" className="left-float" style={{width:120}}
                             defaultValue="选择网元" model={this.props.srcNetunit}
                             onSelect={this.handleSelectSrcNet}/>
                 </div>
                 <div className="form-group">
-                    <label className="label-3">目标网元</label>
+                    <label className="label-4">目标网元</label>
                     <Combox ref="dest" className="left-float" style={{width:120}}
                             defaultValue="选择网元" model={this.props.destNetunit}
                             onSelect={this.handleSelectDestNet}/>
                 </div>
                 <div className="form-group">
-                    <label className="label-3">传输板卡号</label>
+                    <label className="label-4">传输板卡号</label>
                     <Combox ref="slot" className="left-float" style={{width:120}}
                             defaultValue="选择板卡号" model={this.props.card}/>
                 </div>
                 <div className="form-group">
-                    <label className="label-3">端口号</label>
+                    <label className="label-4">端口号</label>
                     <Combox ref="port" className="left-float" style={{width:120}}
                             defaultValue="选择端口" model={this.props.port}/>
                 </div>

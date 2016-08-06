@@ -1,6 +1,7 @@
 import * as Config from '../action/config.js'
 import * as Network from '../action/network.js'
 import * as User from '../action/user.js'
+import {SET_ERROR_TEXT} from '../action/response.js'
 import { combineReducers } from 'redux'
 
 const initElement = {
@@ -51,8 +52,18 @@ const initDevicePort = {
     action: 'create'
 };
 
-const initModifyUserDialog = {
-    visible: false
+const initUserDialog = {
+    visible: false,
+    name: '',
+    role: -1,
+    id: -1
+};
+
+const initRoleDialog = {
+    add: false,
+    modify: false,
+    name: "",
+    id: 0
 };
 
 //新增/修改网元
@@ -228,12 +239,18 @@ function devicePortDialog(state = initDevicePort, action){
     }
 }
 
-function addUserDialog(state = { visible: false},action){
+function addUserDialog(state = initUserDialog ,action){
     switch(action.type){
         case User.OPEN_ADD_USER_DIALOG:
-            return {
-                visible: true
-            };
+            if(action.action=='create')
+                return Object.assign({},initUserDialog,{visible: true});
+            else
+                return Object.assign({}, state, {
+                    name: action.data.name,
+                    role: action.data.roleId,
+                    visible: true,
+                    id: action.data.id
+                });
         case User.CLOSE_ADD_USER_DIALOG:
             return {
                 visible: false
@@ -243,6 +260,41 @@ function addUserDialog(state = { visible: false},action){
     }
 }
 
+function roleDialog(state = initRoleDialog, action){
+    switch(action.type){
+        case User.OPEN_ROLE_DIALOG:
+            return Object.assign({},state,{
+               add: true
+            });
+        case User.CLOSE_ROLE_DIALOG:
+            return Object.assign({}, state, {
+                add: false
+            });
+        case User.OPEN_RENAME_DIALOG:
+            return Object.assign({}, state, {
+                modify: true,
+                name: action.name,
+                id: action.id
+            });
+        case User.CLOSE_RENAME_DIALOG:
+            return Object.assign({}, state, {
+                modify: false
+            });
+        default:
+            return state;
+    }
+}
+
+export function error(state = {errorText: ''}, action){
+    switch (action.type){
+        case SET_ERROR_TEXT:
+            return Object.assign({}, state, {
+                errorText: action.text
+            });
+        default:
+            return state;
+    }
+}
 
 export default combineReducers({
     card,
@@ -253,4 +305,6 @@ export default combineReducers({
     deviceDialog,
     devicePortDialog,
     addUserDialog,
+    roleDialog,
+    error
 });

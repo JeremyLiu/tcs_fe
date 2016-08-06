@@ -1,67 +1,85 @@
 import React from 'react'
-
-const columns = [
-    {
-        render: () => <input type="checkbox" />,
-        width:30
-    },
-    {
-        key: "id",
-        title: "序号",
-        dataIndex: "id",
-        width: 40
-    },
-    {
-        key: "calling_number",
-        title: "主叫号码",
-        dataIndex: "calling_number",
-        width: 120
-    },
-    {
-        key: "called_number",
-        title: "被叫号码",
-        dataIndex: "called_number",
-        width: 120
-    },
-    {
-        key: "create_time",
-        title: "录音开始时间",
-        dataIndex: "create_time",
-        width: 150
-    },
-    {
-        key: "time",
-        title: "时长",
-        dataIndex: "time",
-        width: 80
-    }
-];
-
-const data = [
-    {
-        key: 1,
-        id: 1,
-        calling_number: "1234567890",
-        called_number: "1234567890",
-        create_time: "2016-01-01 10:00:00",
-        time: "20分钟"
-    },
-    {
-        key: 2,
-        id: 2,
-        calling_number: "1234567890",
-        called_number: "1234567890",
-        create_time: "2016-01-01 10:00:00",
-        time: "20分钟"
-    }
-];
+import {connect} from 'react-redux'
+import {logColumns} from '../constant/model.js'
+import Select from 'rc-select'
+import Pagination from 'rc-pagination'
+import Table from 'rc-table'
+import {get_log} from '../action/log.js'
+import 'rc-pagination/assets/index.css'
+import 'rc-select/assets/index.css'
 
 var SysLog = React.createClass({
+
+    componentDidMount(){
+        $('input.form-date').datepicker({
+            format : "yyyy-mm-dd",
+            language : "zh-CN",
+            autoclose : true,
+            clearBtn : true,
+            todayHighlight : true
+        });
+    },
+
+    onShowSizeChange: function(current, pageSize){
+        if(current != pageSize){
+            let {startDate, endDate, search} = this.refs;
+            let {dispatch, page} = this.props;
+            dispatch(get_log(page, pageSize, startDate.value, endDate.value, search.value));
+        }
+    },
+
+    refreshData(){
+        let {startDate, endDate, search} = this.refs;
+        let {dispatch, pageSize} = this.props;
+        dispatch(get_log(1, pageSize, startDate.value, endDate.value, search.value));
+    },
+
+    onPageChange: function (page) {
+        let {startDate, endDate, search} = this.refs;
+        let {dispatch,pageSize} = this.props;
+        dispatch(get_log(page,pageSize,startDate.value, endDate.value, search.value));
+    },
+
     render: function () {
         return(
-            <div></div>
+            <div>
+                <form className="form-inline" style={{marginLeft: 30}}>
+                    <div className="form-group">
+                        <label>日期范围：</label>
+
+                        <input ref="startDate" type="text" readonly="readonly" maxlength="20"
+                               className="form-control form-date compact-inline"
+                               defautValue="" />
+                        <label>至</label>
+                        <input ref="endDate" type="text" readonly="readonly" maxlength="20"
+                               className="form-control form-date compact-inline"
+                               defautValue="" />
+                    </div>
+                    <div className="form-group">
+                        <input ref="search" type="text" className="form-control compact-inline" placeholder="搜索操作用户,模块,操作内容"/>
+                    </div>
+                    <button type="button" className="btn btn-default" onClick={this.refreshData}>查询</button>
+                </form>
+                <Table className="table table-bordered compact-3"
+                       columns={logColumns}
+                       data={this.props.data.map((e,index) => Object.assign({}, e, {key: index}))}
+                       style={{width: '80%'}}/>
+                <Pagination
+                    selectComponentClass={Select}
+                    showTotal={(total) => `一共 ${total} 条数据`}
+                    pageSizeOptions={['10','20','50','100']}
+                    showQuickJumper showSizeChanger
+                    defaultPageSize={this.props.pageSize}
+                    current={this.props.page}
+                    onChange={this.onPageChange}
+                    onShowSizeChange={this.onShowSizeChange} total={this.props.totalCount} />,
+            </div>
         );
     }
 });
 
-export default SysLog;
+function stateMap(state){
+    return state.log;
+}
+
+export default connect(stateMap)(SysLog);

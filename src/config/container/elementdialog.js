@@ -18,11 +18,12 @@ var ElementDialog = React.createClass({
     },
 
     componentWillReceiveProps(nextProps){
-        this.setState({
-            cardCount: nextProps.cardCount,
-            ip: nextProps.ip,
-            name: nextProps.name
-        })
+        if(!nextProps.visible || !this.props.visible)
+            this.setState({
+                cardCount: nextProps.cardCount,
+                ip: nextProps.ip,
+                name: nextProps.name
+            })
     },
 
     onSave(e){
@@ -69,7 +70,7 @@ var ElementDialog = React.createClass({
             visible={this.props.visible}
             animation="slide-fade"
             maskAnimation="fade"
-            style={{ width: 500, height: 200}}
+            style={{ width: 450, height: 200}}
             onClose={this.onCancel}
             title={<div>新建网元</div>}
             footer={
@@ -94,14 +95,14 @@ var ElementDialog = React.createClass({
           }>
               <form className="form-horizontal">
                   <div className="form-group">
-                      <label className="label-3">名称</label>
+                      <label className="label-4">名称</label>
                       <input className="form-control" type="text"
                              value={this.state.name}
                              placeholder="必填,不超过60个字符"
                              onChange={this.handleNameChange}/>
                   </div>
                   <div className="form-group">
-                      <label className="label-3">ip地址</label>
+                      <label className="label-4">ip地址</label>
                       <input className="form-control" type="text"
                              value={this.state.ip}
                              placeholder="必填,格式如192.168.0.1"
@@ -109,7 +110,7 @@ var ElementDialog = React.createClass({
                   </div>
 
                   <div className="form-group">
-                      <label className="label-3">板卡数目</label>
+                      <label className="label-4">板卡数目</label>
                       <div className="left-float">
                           <InputNumber defaultValue={this.props.cardCount}
                                        value={this.state.cardCount}

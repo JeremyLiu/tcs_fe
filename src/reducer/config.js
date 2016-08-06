@@ -10,80 +10,8 @@ const initElementDialog = {
 };
 
 const initConfig ={
-    device:[
-        // {
-        //     id:1,
-        //     name: "test1",
-        //     devices: [
-        //         {
-        //             id:3,
-        //             name: "device1"
-        //         },
-        //         {
-        //             id:2,
-        //             name: "device2"
-        //         }
-        //     ]
-        // },
-        // {
-        //     id:2,
-        //     name: "test1",
-        //     devices: [
-        //         {
-        //             id:3,
-        //             name: "device1"
-        //         },
-        //         {
-        //             id:2,
-        //             name: "device2"
-        //         },
-        //         {
-        //             id:2,
-        //             name: "device2"
-        //         }
-        //     ]
-        // },
-        // {
-        //     id:3,
-        //     name: "test3",
-        //     devices: [
-        //         {
-        //             id:3,
-        //             name: "device1"
-        //         },
-        //         {
-        //             id:2,
-        //             name: "device2"
-        //         },
-        //         {
-        //             id:2,
-        //             name: "device2"
-        //         }
-        //     ]
-        // }
-    ],
-    connect: [
-        // {
-        //     srcId: 1,
-        //     destId: 2
-        // },
-        // {
-        //     srcId: 2,
-        //     destId: 1
-        // },
-        // {
-        //     srcId: 2,
-        //     destId: 3
-        // },
-        // {
-        //     srcId: 1,
-        //     destId: 3
-        // },
-        // {
-        //     srcId: 3,
-        //     destId:1
-        // }
-    ]
+    device:[],
+    connect: []
 };
 
 const initPort={device: -1, ports: []};

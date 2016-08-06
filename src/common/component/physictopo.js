@@ -165,11 +165,7 @@ export default class PhysicTopo extends Component{
         }
     }
 
-
-    refreshNetState(){
-
-    }
-
+    
     getNodeById(id){
         var elements = this.scene.findElements(function(e){return e.id == id})
         return elements[0];

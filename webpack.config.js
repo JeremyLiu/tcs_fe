@@ -3,6 +3,7 @@
  */
 var path = require('path');
 var webpack = require('webpack');
+var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
     entry: {
@@ -25,11 +26,16 @@ module.exports = {
             },
             {
                 test:/\.css?$/,
-                loader:'style!css'
+                loader:ExtractTextPlugin.extract("style", "css?-url")
+            },
+            {
+                test: /\.png|jpg|gif?$/,
+                loader: "file-loader?name=[path][name].[ext]"
             }
         ]
     },
     plugins: [
-        new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
+        new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js'),
+        new ExtractTextPlugin("styles.css")
     ]
 };

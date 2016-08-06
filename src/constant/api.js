@@ -27,6 +27,8 @@ export const GET_BUSISNESS_DATA = 'business/list';
 export const GET_RECORD_ALL = 'business/record/all';
 export const GET_RECORDING = 'business/record/current';
 export const GET_RECORD_HISTORY = 'business/record/history';
+export const PLAY_RECORD = 'business/record/play';
+export const REMOVE_RECORD = 'business/record/remove';
 
 export const GET_ALL_ROLE = "user/roles";
 export const ADD_ROLE = "user/role/create";
@@ -38,6 +40,9 @@ export const ADD_USER = "user/register";
 export const MODIFY_PASSWORD = "user/password/modify";
 export const MODIFY_USER = "user/modify";
 export const REMOVE_USER = "user/remove";
+
+export const GET_LOG = "log";
+export const REMOVE_LOG = "log/remove";
 
 
 

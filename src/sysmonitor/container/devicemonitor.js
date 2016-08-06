@@ -58,7 +58,7 @@ var DeviceMonitor = React.createClass({
 
     render(){
         return(
-        <div>
+        <div style={{marginLeft: 30}}>
             <NetworkStatusBar/>
             <GridView gridWidth={width} gridHeight={height} cellSpace="10" adapter={deviceCell} data={this.props.model}/>
         </div>

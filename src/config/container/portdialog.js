@@ -16,10 +16,11 @@ var DevicePortDialog = React.createClass({
 
 
     componentWillReceiveProps(nextProps){
-        this.setState({
-            id: nextProps.id,
-            name: nextProps.name
-        })
+        if(!nextProps.visible || !this.props.visible)
+            this.setState({
+                id: nextProps.id,
+                name: nextProps.name
+            })
     },
 
     handlePortChange(event){
@@ -45,19 +46,19 @@ var DevicePortDialog = React.createClass({
 
     render(){
         return <ConfigDialog visible={this.props.visible}
-                             width="400" height="200" title="添加端口配置"
+                             width="450" height="200" title="添加端口配置"
                              cancelAction={close_device_port_dialog()}
                              onSave={this.handleClick}>
             <form className="form-horizontal">
                 <div className="form-group">
-                    <label className="label-3">端口号</label>
+                    <label className="label-4">端口号</label>
                     <input className="form-control" type="text"
                            value={this.state.id}
                            placeholder="必填,数字"
                            onChange={this.handlePortChange}/>
                 </div>
                 <div className="form-group">
-                    <label className="label-3">功能</label>
+                    <label className="label-4">功能</label>
                     <input className="form-control" type="text"
                            value={this.state.name}
                            placeholder="必填,不超过60个字符"

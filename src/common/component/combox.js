@@ -49,7 +49,10 @@ var Combox = React.createClass({
             }
 
         let defaultValue = nextProps.defaultValue;
-        if(defaultValue != this.props.defaultValue || change)
+        if( typeof defaultValue != typeof this.props.defaultValue ||
+            (defaultValue instanceof String && defaultValue != this.props.defaultValue) ||
+            (defaultValue instanceof Object && defaultValue.value != this.props.defaultValue.value)
+            || change)
         this.setState({
             value: defaultValue instanceof Object ? defaultValue.text : defaultValue,
             select: defaultValue instanceof Object ? defaultValue : {}

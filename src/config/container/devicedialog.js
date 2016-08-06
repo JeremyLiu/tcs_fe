@@ -13,9 +13,10 @@ var DeviceDialog = React.createClass({
     },
 
     componentWillReceiveProps(nextProps){
-        this.setState({
-            name: nextProps.name
-        })
+        if(!nextProps.visible || !this.props.visible)
+            this.setState({
+                name: nextProps.name
+            })
     },
 
     handleSelect(){
@@ -38,13 +39,13 @@ var DeviceDialog = React.createClass({
 
     render(){
         return <ConfigDialog visible={this.props.visible}
-                             width="400" height="200" title="添加设备"
+                             width="450" height="350" title="添加设备"
                              cancelAction={close_device_dialog()}
                              onSave={this.handleClick}
                             >
             <form className="form-horizontal">
                 <div className="form-group">
-                    <label className="label-3">所属网元</label>
+                    <label className="label-4">所属网元</label>
                     <Combox ref="netunit" className="left-float" style={{width:120}}
                             defaultValue={this.props.netunit<=0?"选择网元":
                             this.props.allNetUnit.filter(e => e.value == this.props.netunit)[0]}
@@ -52,7 +53,7 @@ var DeviceDialog = React.createClass({
                             onSelect={this.handleSelect}/>
                 </div>
                 <div className="form-group">
-                    <label className="label-3">名称</label>
+                    <label className="label-4">名称</label>
                     <input className="form-control" type="text"
                            value={this.state.name}
                            placeholder="必填,不超过60个字符"

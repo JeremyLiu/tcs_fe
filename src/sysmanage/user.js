@@ -3,16 +3,24 @@ import {connect} from 'react-redux'
 import Table from 'rc-table'
 import 'rc-table/assets/index.css'
 import {userColumns, userMenu} from '../constant/model.js'
-import {get_all_user, open_add_user_dialog} from '../action/user.js'
+import {get_all_user, open_add_user_dialog, post_remove_user} from '../action/user.js'
+import {open_confirm_dialog} from '../action/config.js'
 import OperationTrigger from '../common/container/operationtrigger.js'
 import AddUserDialog from './adduserdialog.js'
+import AddRoleDialog from './addroledialog.js'
+import RenameDialog from './renamedialog.js'
 
 var UserManage = React.createClass({
     componentWillMount(){
       this.props.dispatch(get_all_user());
     },
-    handleSelect(){
-
+    handleSelect(row,event){
+        let {dispatch} = this.props;
+        switch(event.key){
+            case 'modify': dispatch(open_add_user_dialog(row)); break;
+            case 'remove': dispatch(open_confirm_dialog("删除用户",
+                "确定删除用户"+row.name+"么?", ()=>dispatch(post_remove_user(row.id)))); break;
+        }
     },
     render(){
         return <div>
@@ -32,6 +40,8 @@ var UserManage = React.createClass({
                     marginLeft: 40
                    }}/>
             <AddUserDialog/>
+            <AddRoleDialog/>
+            <RenameDialog/>
         </div>
     }
 });
@@ -45,6 +55,7 @@ function stateMap(state){
                         roleName: roleMap[e.roleId],
                         roleId: e.roleId,
                         name: e.name,
+                        id: e.id,
                         createTime: e.createTime
                     }
                 })

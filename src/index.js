@@ -19,12 +19,14 @@ import NetworkConfig from './config/container/network.js'
 import DeviceList from './config/container/device.js'
 import UserManage from './sysmanage/user.js'
 import RoleManage from './sysmanage/role.js'
+import ModifyPassword from './sysmanage/modifypassword.js'
 import {get_all_card_type} from './action/config.js'
 import {fetch_net_state, fetch_device_state,
     fetch_card_state, set_timer,
     fetch_business, fetch_business_data,
     refresh_recording_data} from './action/network.js'
 import {get_all_role} from './action/user.js'
+import {get_log} from './action/log.js'
 import {REFRESH_INTERVAL} from './constant/model.js'
 import ConfirmDialog from './common/container/confirmdialog.js'
 import {menu} from './constant/model.js'
@@ -120,7 +122,13 @@ const func = [
     },
     {
         path: [3],
-        content: <SysLog/>
+        content: <SysLog/>,
+        listener: (active) =>{
+            if(active){
+                let state = store.getState();
+                store.dispatch(get_log(state.log.page, state.log.pageSize));
+            }
+        }
     },
     {
         path: [4,0],
@@ -129,8 +137,35 @@ const func = [
     {
         path: [4,1],
         content: <RoleManage/>
+    },
+    {
+        path: [4,2],
+        content: <ModifyPassword/>
     }
 ];
+
+
+function getMenu(){
+    let roleMap = {};
+    window.role.forEach(e => {
+        const array = e.split('-');
+        let index = parseInt(array[0]);
+        if(roleMap[index] == undefined)
+            roleMap[index] = [];
+        if(array.length>0)
+            roleMap[index].push(parseInt(array[1]));
+    });
+    let result = [];
+    for(var key in roleMap){
+        let s = Object.assign({},menu[key],{
+            children: []
+        });
+        if(menu[key].children)
+            roleMap[key].forEach(e => s.children.push(menu[key].children[e]));
+        result.push(s);
+    }
+    return result;
+}
 
 func.forEach(
     e => {
@@ -180,6 +215,10 @@ var App = React.createClass({
         this.onChange();
     },
 
+    logout(){
+        console.log("i clicked");
+    },
+
     render(){
 
         let init = this.props.menu.map(e => 0);
@@ -215,6 +254,7 @@ var App = React.createClass({
                     })
                 }
             </Tabs>
+            <a className="logout-btn" href="logout">登出</a>
             <ConfirmDialog/>
         </div>);
     }
@@ -224,6 +264,6 @@ store.dispatch(get_all_role());
 
 ReactDOM.render(
     <Provider store={store}>
-        <App menu={menu}/>
+        <App menu={getMenu()}/>
     </Provider>,
     document.getElementById('container'));
