@@ -7,7 +7,7 @@ import {fetch_device, fetch_device_port,
      post_remove_device_port} from '../../action/config.js'
 import OperationTrigger from '../../common/container/operationtrigger.js'
 import {deviceColumns, devicePortColumns,
-    deviceMenu, devicePortMenu} from '../../constant/model.js'
+    deviceMenu, devicePortMenu, noDataText} from '../../constant/model.js'
 
 
 var DeviceList = React.createClass({
@@ -62,6 +62,7 @@ var DeviceList = React.createClass({
                                     e.key = index;
                                     return e;
                                })}
+                               emptyText={noDataText}
                                onRowClick={(record,index)=> this.props.dispatch(fetch_device_port(record.id))}/>
                     </div>
                     <div className="left-float" style={{marginLeft: 50}}>
@@ -77,7 +78,7 @@ var DeviceList = React.createClass({
                                data={this.props.ports.map((e, index) => {
                                     e.key = index;
                                     return e;
-                               })}/>
+                               })} emptyText={noDataText}/>
                     </div>
                 </div>);
     }

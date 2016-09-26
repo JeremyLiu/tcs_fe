@@ -13,6 +13,9 @@ import NetworkMonitor from './sysmonitor/container/networkmonitor.js'
 import BusinessMonitor from './sysmonitor/container/businessmonitor.js'
 import DeviceMonitor from './sysmonitor/container/devicemonitor.js'
 import Record from './record/index.js'
+import ClockConfig from './config/container/clockconfig.js'
+import MeetingConfig from './config/container/meetingconfig.js'
+import TonglingConfig from './config/container/tonglingconfig.js'
 import DigitalTrunk from './config/container/digitaltrunk.js'
 import SysLog from './syslog/index.js'
 import NetworkConfig from './config/container/network.js'
@@ -20,9 +23,11 @@ import DeviceList from './config/container/device.js'
 import UserManage from './sysmanage/user.js'
 import RoleManage from './sysmanage/role.js'
 import ModifyPassword from './sysmanage/modifypassword.js'
-import {get_all_card_type} from './action/config.js'
+import {get_all_card_type, get_clock_config,
+    get_meeting_config, get_tongling_config,
+    get_digittrunk_config} from './action/config.js'
 import {fetch_net_state, fetch_device_state,
-    fetch_card_state, set_timer,
+    fetch_card_state, set_timer, clear_timer,
     fetch_business, fetch_business_data,
     refresh_recording_data} from './action/network.js'
 import {get_all_role} from './action/user.js'
@@ -36,6 +41,11 @@ const store = createStore(rootReducer,  applyMiddleware(
     thunkMiddleware, // 允许我们 dispatch() 函数
     loggerMiddleware // 一个很便捷的 middleware，用来打印 action 日志
 ));
+
+let clearTimer = (active) => {
+    if(active)
+        store.dispatch(clear_timer());
+};
 
 const func = [
     {
@@ -94,19 +104,58 @@ const func = [
     },
     {
         path: [1,0],
-        content: <NetworkConfig/>
+        content: <NetworkConfig/>,
+        listener: clearTimer
     },
     {
         path: [1,1],
-        content: <DeviceList/>
+        content: <DeviceList/>,
+        listener: clearTimer
     },
     {
         path: [1,2],
-        content: <DigitalTrunk/>
+        content: <DigitalTrunk/>,
+        listener: (active) =>{
+            if(active){
+                store.dispatch(get_digittrunk_config());
+                store.dispatch(clear_timer());
+            }
+        }
+    },
+    {
+        path: [1,3],
+        content: <ClockConfig/>,
+        listener: (active) => {
+            if(active){
+                store.dispatch(get_clock_config());
+                store.dispatch(clear_timer());
+            }
+        }
+    },
+    {
+        path: [1,4],
+        content: <MeetingConfig/>,
+        listener: (active) => {
+            if(active) {
+                store.dispatch(get_meeting_config());
+                store.dispatch(clear_timer());
+            }
+        }
+    },
+    {
+        path: [1,5],
+        content: <TonglingConfig/>,
+        listener: (active) => {
+            if(active){
+                store.dispatch(get_tongling_config());
+                store.dispatch(clear_timer());
+            }
+        }
     },
     {
         path: [4,0],
-        content: <UserManage/>
+        content: <UserManage/>,
+        listener: clearTimer
     },
     {
         path: [2],
@@ -127,20 +176,24 @@ const func = [
             if(active){
                 let state = store.getState();
                 store.dispatch(get_log(state.log.page, state.log.pageSize));
+                store.dispatch(clear_timer());
             }
         }
     },
     {
         path: [4,0],
-        content: <UserManage/>
+        content: <UserManage/>,
+        listener: clearTimer
     },
     {
         path: [4,1],
-        content: <RoleManage/>
+        content: <RoleManage/>,
+        listener: clearTimer
     },
     {
         path: [4,2],
-        content: <ModifyPassword/>
+        content: <ModifyPassword/>,
+        listener: clearTimer
     }
 ];
 

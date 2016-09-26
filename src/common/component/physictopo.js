@@ -148,7 +148,7 @@ export default class PhysicTopo extends Component{
                         // otherLink.arrowsRadius = 0;
 
                         // this.scene.add(otherLink);
-                        var link = new JTopo.Link(srcNodes[0], destNodes[0]);
+                        var link = new JTopo.CurveLink(srcNodes[0], destNodes[0]);
                         link.arrowsRadius = 10;
                         // link.arrowsOffset = 0;
                         // link.bundleGap = 10;

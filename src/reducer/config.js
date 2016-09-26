@@ -1,5 +1,4 @@
 import * as Action from '../action/config.js'
-import { combineReducers } from 'redux'
 
 const initElementDialog = {
     isOpen : false,
@@ -135,6 +134,26 @@ export function devicePort(state = initPort, action){
             };
         case Action.CLEAR_PORT_LIST:
             return initPort;
+        default:
+            return state;
+    }
+}
+
+export function outlineConfigs(state={}, action){
+    let newData = {};
+    switch(action.type){
+        case Action.SET_OUTLINE_CONFIG:
+            newData[action.configType] = action.data;
+            return Object.assign({}, state, newData);
+        case Action.REMOVE_OUTLINE_CONFIG:
+            let data = state[action.configType];
+            if(action.id>0)
+                data = data.filter(e => e.id!=action.id);
+            else
+                data = data.filter(e => e.netunit!=action.netunit);
+            newData[action.configType] = data;
+            return Object.assign({}, state, newData);
+
         default:
             return state;
     }

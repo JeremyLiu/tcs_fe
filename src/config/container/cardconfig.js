@@ -3,19 +3,31 @@ import 'rc-select/assets/index.css'
 import 'rc-table/assets/index.css'
 import React, {PropTypes} from 'react'
 import * as Action from '../../action/config.js'
+import * as NetStatus from '../../sysmonitor/component/networkstatusbar.js'
 import {connect} from 'react-redux'
 import Table from 'rc-table'
 import Combox from '../../common/component/combox.js'
+import {noDataText} from '../../constant/model.js'
 
 
 var CardConfig = React.createClass({
 
+    handleClick(e){
+        let {dispatch, netunit} = this.props;
+        dispatch(Action.open_confirm_dialog('下载板卡配置','确定要下载'+netunit.name+'的板卡配置吗?'), () => {
+            dispatch(Action.close_confimr_dialog());
+            dispatch(Action.set_loading(true,'正在配置'+netunit.name+'的板卡'));
+            dispatch(Action.download_card(netunit.id));
+        })
+    },
+
     render(){
         return <div>
             <button style={{marginLeft: 30}}className="btn btn-default left-float" onClick={() => this.props.dispatch(Action.close_card_config())}>返回</button>
-            <h3>{this.props.title}</h3>
+            <button className="btn btn-default left-float compact-inline" disabled={!this.props.canDownload} onClick={this.handleClick}>下载配置</button>
+            <h3>{this.props.netunit.name+"的板卡配置"}</h3>
             <div style={{padding: '0 30%'}}>
-                <Table className="table table-bordered compact-3"
+                <Table className="table table-bordered compact-3" style={{overflow:'auto'}}
                        columns={[
                             {
                                 key:'id',
@@ -34,7 +46,7 @@ var CardConfig = React.createClass({
                                 width: 150
                             }
                         ]}
-                       data={this.props.model}/>
+                       data={this.props.model} emptyText={noDataText}/>
             </div>
         </div>
     }
@@ -53,10 +65,14 @@ function stateMap(state){
         }
     });
 
+    let netunit = state.ui.cardConfig.netunit;
+
     return {
         model: card,
-        title: state.ui.cardConfig.netunit.name+"的板卡配置",
-        cardType: cardType
+        netunit: netunit,
+        cardType: cardType,
+        canDownload: netunit.state == NetStatus.STATUS_NORMAL
+            || netunit.state == NetStatus.STATUS_ERROR
     };
 }
 

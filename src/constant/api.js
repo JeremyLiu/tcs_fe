@@ -22,6 +22,11 @@ export const CREATE_DEVICE_PORT = "device/port/create";
 export const MODIFY_DEVICE_PORT = "device/port/modify";
 export const REMOVE_DEVICE_PORT = "device/port/remove";
 
+export const DOWNLOAD_CONFIG = 'config/download/';
+export const GET_OUTLINE_CONFIG = "config/";
+export const REMOVE_OUTLINE_CONFIG = "config/remove/";
+export const SAVE_OUTLINE_CONFIG = "config/save/";
+
 export const GET_BUSINESS = 'business';
 export const GET_BUSISNESS_DATA = 'business/list';
 export const GET_RECORD_ALL = 'business/record/all';

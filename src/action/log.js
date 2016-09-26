@@ -3,6 +3,15 @@ import * as API from '../constant/api.js'
 import {response} from './response.js'
 
 export const GET_LOG = 'GET_LOG';
+export const SELECT_LOG = 'SELECT_LOG';
+
+export function select_log(id, select){
+    return {
+        type: SELECT_LOG,
+        id: id,
+        select: select
+    }
+}
 
 export function get_log(page, pageSize, startDate='', endDate='', searchKey=''){
     const url = API.GET_LOG + "?page=" + page +
@@ -36,3 +45,4 @@ export function remove_log(ids, callback){
         body: JSON.stringify(ids)
     }).then(response).then(data => callback(data))
 }
+

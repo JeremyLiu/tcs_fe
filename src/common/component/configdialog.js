@@ -41,7 +41,7 @@ var ConfigDialog = React.createClass({
             [
               <button
                 type="button"
-                className="btn btn-default"
+                className="btn btn-default compact-inline"
                 key="close"
                 onClick={this.onCancel}
               >
@@ -69,7 +69,8 @@ ConfigDialog.PropTypes = {
     height: PropTypes.number.isRequired,
     visible: PropTypes.bool.isRequired,
     title: PropTypes.string.isRequired,
-    onSave: PropTypes.func.isRequired
+    onSave: PropTypes.func.isRequired,
+    errorText: PropTypes.func.isRequired
 };
 
 function stateMap(state){

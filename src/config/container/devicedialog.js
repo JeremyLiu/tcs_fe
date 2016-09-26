@@ -39,7 +39,7 @@ var DeviceDialog = React.createClass({
 
     render(){
         return <ConfigDialog visible={this.props.visible}
-                             width="450" height="350" title="添加设备"
+                             width="450" height="350" title={this.props.action == 'create'? "添加设备":"修改设备"}
                              cancelAction={close_device_dialog()}
                              onSave={this.handleClick}
                             >

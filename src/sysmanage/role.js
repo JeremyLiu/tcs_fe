@@ -3,7 +3,7 @@ import 'rc-tree-select/assets/index.css'
 import {connect} from 'react-redux'
 import Table from 'rc-table'
 import 'rc-table/assets/index.css'
-import {roleColumns, roleMenu} from '../constant/model.js'
+import {roleColumns, roleMenu, noDataText} from '../constant/model.js'
 import {open_role_dialog, modify_role_privilege, remove_role, open_rename_dialog} from '../action/user.js'
 import {open_confirm_dialog} from '../action/config.js'
 import OperationTrigger from '../common/container/operationtrigger.js'
@@ -55,7 +55,7 @@ var RoleManage = React.createClass({
                    data={this.props.role.map((e, index) => Object.assign({},e,{key:index}))} style={{
                     minWidth: 400,
                     marginLeft: 40
-                   }}/>
+                   }} emptyText={noDataText}/>
         </div>
     }
 });

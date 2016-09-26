@@ -3,7 +3,8 @@ import {connect} from 'react-redux'
 import Table from 'rc-table'
 import 'rc-table/assets/index.css'
 import SwitchView from '../../common/component/switchview.js'
-import {businessBriefColumn, businessColumns, REFRESH_INTERVAL} from '../../constant/model.js'
+import {businessBriefColumn, businessColumns,
+    REFRESH_INTERVAL, noDataText} from '../../constant/model.js'
 import {fetch_business, fetch_business_data, show_business_detail, set_timer} from '../../action/network.js'
 
 var BusinessMonitor = React.createClass({
@@ -43,6 +44,7 @@ var BusinessMonitor = React.createClass({
                         width: 600
                         }}
                       onRowClick={this.switchView}
+                      emptyText={noDataText}
                />
                <div>
                    <Table className="table table-bordered compact-3"
@@ -50,7 +52,8 @@ var BusinessMonitor = React.createClass({
                           data={this.props.detail.map((e,index) => Object.assign({},e,{key: index+1}))}
                           style={{
                             width: 600
-                            }}/>
+                            }}
+                          emptyText={noDataText}/>
                </div>
            </SwitchView>
        </div>

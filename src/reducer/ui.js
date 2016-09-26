@@ -66,6 +66,11 @@ const initRoleDialog = {
     id: 0
 };
 
+const initLoading = {
+    visible: false,
+    text: ''
+};
+
 //新增/修改网元
 function element(state=initElement, action){
     switch(action.type){
@@ -296,6 +301,29 @@ export function error(state = {errorText: ''}, action){
     }
 }
 
+export function loading(state = initLoading, action){
+    switch(action.type){
+        case Config.SET_LOADING:
+            return {
+                text: action.text,
+                visible: action.visible
+            };
+        default:
+            return state;
+    }
+}
+
+export function configDialog(state = {}, action){
+    let newState = {};
+    switch(action.type){
+        case Config.SET_CONFIG_DIALOG_VISIBLE:
+            newState[action.configType] = action.visible;
+            return Object.assign({}, state, newState);
+        default:
+            return state;
+    }
+}
+
 export default combineReducers({
     card,
     cardConfig,
@@ -304,7 +332,9 @@ export default combineReducers({
     confirmDialog,
     deviceDialog,
     devicePortDialog,
+    configDialog,
     addUserDialog,
     roleDialog,
-    error
+    error,
+    loading
 });

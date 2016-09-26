@@ -38,6 +38,14 @@ var Combox = React.createClass({
         return this.state.select;
     },
 
+    clearSelect(){
+        let {defaultValue} = this.props;
+        this.setState({
+            value: defaultValue instanceof Object ? defaultValue.text : defaultValue,
+            select: defaultValue instanceof Object ? defaultValue : {}
+        });
+    },
+
     componentWillReceiveProps(nextProps){
 
         let change = nextProps.model.length != this.props.model.length;
@@ -62,7 +70,8 @@ var Combox = React.createClass({
     render(){
         return (<div className={"dropdown "+this.props.className} style={this.props.style}>
             <button ref="expand" className="btn btn-default dropdown-toggle" type="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                    disabled={this.props.disable? "disabled": ""}>
                 {this.state.value}
                 <span className="caret"/>
             </button>

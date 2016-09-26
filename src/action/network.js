@@ -33,10 +33,9 @@ export function set_timer(timer){
     }
 }
 
-export function clear_timer(timer){
+export function clear_timer(){
     return {
-        type: CLEAR_TIMER,
-        timer: timer
+        type: CLEAR_TIMER
     }
 }
 
@@ -196,6 +195,7 @@ export function refresh_recording_data(){
 export function remove_record(id){
     const url = API.REMOVE_RECORD + "?id=" + id;
     return (dispatch) => fetch(url,{
+        method: 'DELETE',
         credentials: "same-origin"
     }).then(response)
         .then(data => {

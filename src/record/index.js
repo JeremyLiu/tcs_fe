@@ -1,7 +1,7 @@
 import React from 'react'
 import Table from 'rc-table'
 import {connect} from 'react-redux'
-import {recordColumns, getTimeStr, recordMenu} from '../constant/model.js'
+import {recordColumns, getTimeStr, recordMenu, noDataText} from '../constant/model.js'
 import {fetch_record, play_record, remove_record, search_record_data} from '../action/network.js'
 import {open_confirm_dialog} from '../action/config.js'
 import Player from './player.js'
@@ -71,7 +71,7 @@ var Record = React.createClass({
                 data={[
                     ...this.props.current,
                     ...this.props.history
-                ]} style={{width: '80%'}}/>
+                ]} style={{width: '80%'}} emptyText={noDataText}/>
         </div>;
     }
 });

@@ -220,8 +220,8 @@ export function modify_role_name(id, name){
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            credentials: "same-origin"
         },
+        credentials: "same-origin"
     }).then(response).then(data => {
         if(data.status == 0 && data.data){
             dispatch({

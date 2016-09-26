@@ -2,9 +2,9 @@ import 'rc-dialog/assets/index.css'
 import 'rc-table/assets/index.css'
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
-import NetworkStatusBar, * as NetStatus from '../component/networkstatusbar.js'
+import * as NetStatus from '../component/networkstatusbar.js'
 import GridView from '../../common/component/gridview.js'
-import {REFRESH_INTERVAL} from "../../constant/model.js"
+import {REFRESH_INTERVAL, noDataText} from "../../constant/model.js"
 import Table from 'rc-table'
 import {fetch_card_state, set_timer} from '../../action/network.js'
 
@@ -112,7 +112,7 @@ var CardDialog = React.createClass({
                        data = {this.getSelect()}
                        style={{
                     width: 600
-                }}/>
+                }} emptyText={noDataText}/>
             </div>);
     }
 });

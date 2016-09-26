@@ -19,7 +19,13 @@ export const selectView = [
 ];
 
 export const OP_CARD_TYPE = 10;
+export const CARD_TYPE_NUL = 0;
+export const CARD_TYPE_DIGITTRUNK = 6;
 export const REFRESH_INTERVAL = 2000;
+
+export function noDataText(){
+    return '暂无数据';
+}
 
 export const deviceMenu = [
     {
@@ -178,6 +184,18 @@ export const menu = [
             {
                 value: "1-2",
                 label: "数字中继"
+            },
+            {
+                value: "1-3",
+                label: "时钟配置"
+            },
+            {
+                value: "1-4",
+                label: "会议配置"
+            },
+            {
+                value: '1-5',
+                label: '通令配置'
             }
         ]
     },
@@ -536,11 +554,6 @@ export const recordColumns = [
 
 export const logColumns = [
     {
-        dataIndex: "id",
-        width: 50,
-        render: (value, row, index) => <input type="checkbox" data-id={value}/>
-    },
-    {
         key: "operator",
         title: "操作用户",
         dataIndex: "operator",
@@ -561,8 +574,234 @@ export const logColumns = [
     {
         key: "createTime",
         title: "时间",
-        dataIndex: "createTime",
+        dataIndex: "createTime"
 
     }
-]
+];
 
+export const configOperationMenu = [
+    {
+        key: 'modify',
+        text: '修改'
+    },
+    {
+        key: 'remove',
+        text: '删除'
+    }
+];
+
+export const digitTrunkColumns = [
+    {
+        key: 'netunit',
+        title: '网元',
+        dataIndex: 'netunit',
+        width: 120
+    },
+    {
+        key: 'slot1',
+        title: '槽位',
+        dataIndex: 'slot',
+        width: 80
+    },
+    {
+        key: 'port1',
+        title: '端口',
+        dataIndex: 'port',
+        width: 80
+    },
+    {
+        key: 'dpc',
+        title: 'DPC',
+        dataIndex: 'dpc',
+        width: 120
+    },
+    {
+        key: 'opc',
+        title: 'OPC',
+        dataIndex: 'opc',
+        width: 120
+    },
+    {
+        key: 'cic',
+        title: 'CIC',
+        dataIndex: 'cic',
+        width: 120
+    },
+    {
+        key: 'updateDate',
+        title: '修改时间',
+        dataIndex: 'updateDate',
+        width: 200
+    }
+];
+
+export const clockConfigColumns = [
+    {
+        key: 'netunit',
+        title: '网元',
+        dataIndex: 'netunit',
+        width: 120
+    },
+    {
+        key: 'main',
+        title: '主时钟',
+        children: [
+            {
+                key: 'slot1',
+                title: '槽位',
+                dataIndex: 'slot1',
+                width: 100
+            },
+            {
+                key: 'type1',
+                title: '类型',
+                dataIndex: 'type1',
+                width: 150
+            },
+            {
+                key: 'port1',
+                title: '端口',
+                dataIndex: 'port1',
+                width: 100
+            }
+        ]
+    },
+    {
+        key: 'backup1',
+        title: '备时钟1',
+        children: [
+            {
+                key: 'slot2',
+                title: '槽位',
+                dataIndex: 'slot2',
+                width: 100
+            },
+            {
+                key: 'type2',
+                title: '类型',
+                dataIndex: 'type2',
+                width: 150
+            },
+            {
+                key: 'port2',
+                title: '端口',
+                dataIndex: 'port2',
+                width: 100
+            }
+        ]
+    },
+    {
+        key: 'backup2',
+        title: '备时钟2',
+        children: [
+            {
+                key: 'slot3',
+                title: '槽位',
+                dataIndex: 'slot3',
+                width: 100
+            },
+            {
+                key: 'type3',
+                title: '类型',
+                dataIndex: 'type3',
+                width: 150
+            },
+            {
+                key: 'port3',
+                title: '端口',
+                dataIndex: 'port3',
+                width: 100
+            }
+        ]
+    },
+    {
+        key: 'updateDate',
+        title: '修改时间',
+        dataIndex: 'updateDate',
+        width: 200
+    }
+];
+
+export const meetingConfigColumn = [
+    {
+        key: 'netunit',
+        title: '网元',
+        dataIndex: 'netunit',
+        width: 120
+    },
+    {
+        key: 'name',
+        title: '名称',
+        dataIndex: 'name',
+        width: 100
+    },
+    {
+        key: 'code',
+        title: '编号',
+        dataIndex: 'code',
+        width: 100
+    },
+    {
+        key: 'users',
+        title: '用户',
+        dataIndex: 'users',
+        width: 250
+    },
+    {
+        key: 'members',
+        title: '成员',
+        dataIndex: 'members',
+        width: 250
+    },
+    {
+        key: 'updateDate',
+        title: '修改时间',
+        dataIndex: 'updateDate',
+        width: 200
+    }
+];
+
+export const tonglingConfigColumn = [
+    {
+        key: 'netunit',
+        title: '网元',
+        dataIndex: 'netunit',
+        width: 120
+    },
+    {
+        key: 'name',
+        title: '名称',
+        dataIndex: 'name',
+        width: 80
+    },
+    {
+        key: 'code',
+        title: '编号',
+        dataIndex: 'code',
+        width: 80
+    },
+    {
+        key: 'users',
+        title: '用户',
+        dataIndex: 'users',
+        width: 200
+    },
+    {
+        key: 'members',
+        title: '成员',
+        dataIndex: 'members',
+        width: 200
+    },
+    {
+        key: 'commanders',
+        title: '指挥',
+        dataIndex: 'commanders',
+        width: 200
+    },
+    {
+        key: 'updateDate',
+        title: '修改时间',
+        dataIndex: 'updateDate',
+        width: 200
+    }
+];

@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 import Table from 'rc-table'
 import 'rc-table/assets/index.css'
-import {userColumns, userMenu} from '../constant/model.js'
+import {userColumns, userMenu, noDataText} from '../constant/model.js'
 import {get_all_user, open_add_user_dialog, post_remove_user} from '../action/user.js'
 import {open_confirm_dialog} from '../action/config.js'
 import OperationTrigger from '../common/container/operationtrigger.js'
@@ -38,7 +38,7 @@ var UserManage = React.createClass({
                    data={this.props.user.map((e, index) => Object.assign({},e,{key:index}))} style={{
                     width: 650,
                     marginLeft: 40
-                   }}/>
+                   }} emptyText={noDataText}/>
             <AddUserDialog/>
             <AddRoleDialog/>
             <RenameDialog/>

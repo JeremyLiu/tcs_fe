@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch'
 import * as API from '../constant/api.js'
 import {response, set_error_text} from './response.js'
+import notify from '../common/component/notification.js'
 
 //拓扑相关
 export const ADD_ELEMENT = 'RECIEVE_ADD_ELEMENT';
@@ -62,6 +63,11 @@ export const CLOSE_DEVICE_DIALOG = 'CLOSE_DEVICE_DIALOG';
 
 export const OPEN_DEVICE_PORT_DIALOG = 'OPEN_DEVICE_PORT_DIALOG';
 export const CLOSE_DEVICE_PORT_DIALOG = 'CLOSE_DEVICE_PORT_DIALOG';
+
+export const SET_LOADING = 'SET_LOADING';
+export const SET_OUTLINE_CONFIG = 'SET_OUTLINE_CONFIG';
+export const REMOVE_OUTLINE_CONFIG = 'REMOVE_OUTLINE_CONFIG';
+export const SET_CONFIG_DIALOG_VISIBLE = 'SET_CONFIG_DIALOG_VISIBLE';
 
 export function open_add_dialog(action='create', data={id:0, name:'',ip:'', cardCount: 14}){
     return {
@@ -127,7 +133,13 @@ export function open_confirm_dialog(title, text, confirm){
     }
 }
 
-export function fetch_card_slot(netunit, type, callback){
+export function close_confimr_dialog(){
+    return {
+        type: CLOSE_CONFIRM_DIALOG
+    }
+}
+
+export function fetch_card_slot(netunit, type=-1, callback){
     const url = API.GET_NETUNIT_CARD_SLOT+ "?netunit="+netunit+"&type="+type;
     return (dispatch) => fetch(url,{
         credentials: "same-origin"
@@ -180,6 +192,22 @@ export function open_device_port_dialog(deviceId, action='create', data={}){
 export function close_device_port_dialog(){
     return {
         type: CLOSE_DEVICE_PORT_DIALOG
+    }
+}
+
+export function set_loading(visible, text=''){
+    return {
+        type: SET_LOADING,
+        visible: visible,
+        text: text
+    }
+}
+
+export function set_config_dialog_visible(type, visible=false){
+    return {
+        type: SET_CONFIG_DIALOG_VISIBLE,
+        configType: type,
+        visible: visible
     }
 }
 
@@ -287,6 +315,21 @@ export function fetch_device_port(deviceId){
                     data: data.data
                 })
         });
+}
+
+function get_outline_config(type){
+    const url = API.GET_OUTLINE_CONFIG + type;
+    return (dispatch) => fetch(url,{
+        credentials: "same-origin"
+    }).then(response).then(data => {
+        if(data.status == 0){
+            dispatch({
+                type: SET_OUTLINE_CONFIG,
+                configType: type,
+                data: data.data
+            });
+        }
+    })
 }
 
 export function post_add_device(netunit, name, netUnitName){
@@ -544,4 +587,119 @@ export function post_modify_card_type(id, type, name){
             }
         }
     )
+}
+
+function save_outline_config(type, data){
+    const url = API.SAVE_OUTLINE_CONFIG + type;
+    return (dispatch) => fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: "same-origin",
+        body: JSON.stringify(data)
+    }).then(response).then(
+        data => {
+            if(data.status == 0){
+                dispatch(get_outline_config(type));
+                dispatch(set_config_dialog_visible(type, false));
+                dispatch(set_error_text(''));
+            }else
+                dispatch(set_error_text(data.message));
+        }
+    )
+}
+
+export function download_config(type, netunit = 0, callback){
+    let url = API.DOWNLOAD_CONFIG + type;
+    if(netunit>0)
+        url = url + '?netunit=' + netunit;
+    return (dispatch) => fetch(url, {
+        method: 'POST',
+        credentials: "same-origin",
+    }).then(response).then(callback);
+}
+
+function remove_config(type, netunit=0, id=0){
+    const url = API.REMOVE_OUTLINE_CONFIG + type +
+        "?netunit=" + netunit + "&id=" + id;
+    return (dispatch) => fetch(url, {
+        method: 'DELETE',
+        credentials: "same-origin"
+    }).then(response).then(data => {
+        if(data.status == 0 && data.data){
+            dispatch({
+                type: REMOVE_OUTLINE_CONFIG,
+                configType: type,
+                id: id,
+                netunit: netunit
+            })
+        }else
+            notify("配置删除失败");
+    })
+}
+
+export function get_clock_config(){
+    return get_outline_config('clock');
+}
+
+export function get_meeting_config(){
+    return get_outline_config('meeting');
+}
+
+export function get_tongling_config() {
+    return get_outline_config('tongling');
+}
+
+export function get_digittrunk_config(){
+    return get_outline_config('digittrunk');
+}
+
+export function save_clock(data){
+    return save_outline_config('clock', data);
+}
+
+export function save_meeting(data){
+    return save_outline_config('meeting', data);
+}
+
+export function save_tongling(data){
+    return save_outline_config('tongling', data);
+}
+
+export function save_digittrunk(data){
+    return save_outline_config('digittrunk', data);
+}
+
+export function download_card(netunit = 0){
+    return download_config('card', netunit);
+}
+
+export function download_clock(netunit = 0){
+    return download_config('clock', netunit);
+}
+
+export function download_meeting(id = 0){
+    return download_config('meeting', id);
+}
+
+export function download_tongling(id = 0){
+    return download_config('tongling', id);
+}
+
+export function remove_clock_config(netunit = 0){
+    return remove_config("clock", netunit);
+}
+
+export function remove_meeting_config(id = 0){
+    return remove_config("meeting", 0, id);
+}
+
+export function remove_tongling_config(id = 0){
+    return remove_config("tongling", 0, id);
+}
+
+export function remove_digittrunk_config(id = 0){
+    return remove_config('digittrunk', 0, id);
 }

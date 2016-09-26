@@ -66,7 +66,7 @@ var NetworkConfig = React.createClass({
                         <div className="form-group">
                             <button className="btn btn-default"
                                     onClick={()=> this.props.dispatch(Action.open_add_dialog())}>新增网元</button>
-                            <button className="btn btn-default"
+                            <button className="btn btn-default compact-inline"
                                     onClick={()=> this.props.dispatch(Action.open_connect_dialog())}>新建连接</button>
                             <button className="btn btn-default">导入配置</button>
                         </div>

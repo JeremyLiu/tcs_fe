@@ -72,7 +72,7 @@ var ElementDialog = React.createClass({
             maskAnimation="fade"
             style={{ width: 450, height: 200}}
             onClose={this.onCancel}
-            title={<div>新建网元</div>}
+            title={<div>{this.props.action == 'create'? '新建网元' : '修改网元'}</div>}
             footer={
             [
               <button

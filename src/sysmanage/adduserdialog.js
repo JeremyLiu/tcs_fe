@@ -39,7 +39,7 @@ var AddUserDialog = React.createClass({
     render(){
         return <ConfigDialog width="450" height="200"
                              visible={this.props.visible}
-                             title="添加用户"
+                             title={this.props.id <= 0 ?"添加用户":"修改用户"}
                              onSave={this.handleSave}
                              cancelAction={{type: CLOSE_ADD_USER_DIALOG}}>
             <form className="form-horizontal"  autoComplete="off">

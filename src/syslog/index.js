@@ -1,14 +1,21 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {logColumns} from '../constant/model.js'
+import {logColumns ,noDataText} from '../constant/model.js'
 import Select from 'rc-select'
 import Pagination from 'rc-pagination'
 import Table from 'rc-table'
-import {get_log} from '../action/log.js'
+import {get_log, remove_log} from '../action/log.js'
+import {open_confirm_dialog, close_confimr_dialog} from '../action/config.js'
 import 'rc-pagination/assets/index.css'
 import 'rc-select/assets/index.css'
 
 var SysLog = React.createClass({
+
+    getInitialState(){
+        return {
+            select : []
+        }
+    },
 
     componentDidMount(){
         $('input.form-date').datepicker({
@@ -40,6 +47,33 @@ var SysLog = React.createClass({
         dispatch(get_log(page,pageSize,startDate.value, endDate.value, search.value));
     },
 
+    handleCheck(event){
+        let id = event.target.value;
+        if(event.target.checked){
+            this.setState({
+                select: [...this.state.select, id]
+            })
+        }else
+            this.setState({
+                select: this.state.select.filter(e => e!=id)
+            });
+    },
+
+    handleRemove(e){
+        let {dispatch, page, pageSize} = this.props;
+        dispatch(open_confirm_dialog('删除日志', '确定要删除所选日志?', ()=>{
+            dispatch(remove_log(this.state.select, (data) =>{
+                if(data.status == 0){
+                    let nextPage = page;
+                    if(this.state.select.length == pageSize)
+                        nextPage -= 1;
+                    dispatch(get_log(nextPage, pageSize));
+                    dispatch(close_confimr_dialog());
+                }
+            }))
+        }))
+    },
+
     render: function () {
         return(
             <div>
@@ -59,11 +93,18 @@ var SysLog = React.createClass({
                         <input ref="search" type="text" className="form-control compact-inline" placeholder="搜索操作用户,模块,操作内容"/>
                     </div>
                     <button type="button" className="btn btn-default" onClick={this.refreshData}>查询</button>
+                    <button type="button" className="compact-inline btn btn-default" disabled={this.state.select.length==0} onClick={this.handleRemove}>删除</button>
                 </form>
                 <Table className="table table-bordered compact-3"
-                       columns={logColumns}
+                       columns={[
+                           {
+                            dataIndex: "id",
+                            width: 50,
+                            render: (value, row, index) => <input type="checkbox" value={value} onChange={this.handleCheck}/>
+                        },
+                       ...logColumns]}
                        data={this.props.data.map((e,index) => Object.assign({}, e, {key: index}))}
-                       style={{width: '80%'}}/>
+                       style={{width: '80%'}} emptyText={noDataText}/>
                 <Pagination
                     selectComponentClass={Select}
                     showTotal={(total) => `一共 ${total} 条数据`}

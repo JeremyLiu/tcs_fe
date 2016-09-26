@@ -42,7 +42,7 @@ var RadioGroup = React.createClass({
             radios = this.props.data.map((model,index) => {
                 return  <span>
                             <input  name={this.props.name}
-                                    onClick={this.handleChange.bind(this,model,index)}
+                                    onClick={this.handleChange.bind(this, model,index)}
                                     type="radio"
                                     defaultChecked={index == this.props.defaultSelect? "checked":""}
                                     />
