@@ -4,7 +4,7 @@ import Table from 'rc-table'
 import 'rc-table/assets/index.css'
 import SwitchView from '../../common/component/switchview.js'
 import {businessBriefColumn, businessColumns,
-    REFRESH_INTERVAL, noDataText} from '../../constant/model.js'
+    REFRESH_INTERVAL, noDataText, businessWidthMap} from '../../constant/model.js'
 import {fetch_business, fetch_business_data, show_business_detail, set_timer} from '../../action/network.js'
 
 var BusinessMonitor = React.createClass({
@@ -41,7 +41,7 @@ var BusinessMonitor = React.createClass({
                       columns={businessBriefColumn}
                       data={this.props.brief.map((e,index) => Object.assign({},e,{key: index}))}
                       style={{
-                        width: 600
+                        width: 500
                         }}
                       onRowClick={this.switchView}
                       emptyText={noDataText}
@@ -51,7 +51,7 @@ var BusinessMonitor = React.createClass({
                           columns={businessColumns[this.props.curDetail]}
                           data={this.props.detail.map((e,index) => Object.assign({},e,{key: index+1}))}
                           style={{
-                            width: 600
+                            width: businessWidthMap[this.props.curDetial]
                             }}
                           emptyText={noDataText}/>
                </div>
@@ -64,7 +64,14 @@ var BusinessMonitor = React.createClass({
 });
 
 function stateMap(state){
-    return state.business;
+    let netunitMap = {};
+    state.netUnitConfig.device.forEach(e => {
+        netunitMap[e.id] = e.name;
+    });
+    let detail = state.business.detail.map(e => Object.assign({}, e, {
+        netunitName: netunitMap[e.netunit]
+    }));
+    return Object.assign({}, state.business,{detail: detail});
 }
 
 export default connect(stateMap)(BusinessMonitor);

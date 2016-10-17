@@ -40,7 +40,8 @@ var CardConfig = React.createClass({
                                 title: "类型",
                                 render: (value,row,index) => {
                                     return <Combox model={this.props.cardType}
-                                    defaultValue={row.name}
+                                    defaultValue={index>0?row.name:"电源"}
+                                    disable={index==0}
                                     onSelect={value => this.props.dispatch(Action.post_modify_card_type(row.id,value.value,value.text))}/>
                                 },
                                 width: 150

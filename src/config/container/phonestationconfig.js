@@ -1,0 +1,116 @@
+import React from 'react'
+import {connect} from 'react-redux'
+import BaseConfig from '../component/baseconfig.js'
+import UserDataSelect from '../component/usernumberselect.js'
+import {phoneStationColumn} from '../../constant/model.js'
+import {open_confirm_dialog, close_confimr_dialog,
+    remove_phonestation, save_phonestation} from '../../action/config.js'
+
+var PhoneStationConfig = React.createClass({
+
+    getInitialState(){
+        return {
+            id: 0,
+            selectNetunit: -1,
+            name: '',
+            code: '',
+            members: []
+        }
+    },
+
+    addAction(){
+        this.setState(this.getInitialState());
+    },
+
+    saveAction(select){
+        let {name, code, members, id} = this.state;
+
+        let data = {
+            id: id,
+            netunit: select.value,
+            name: name,
+            code: code,
+            members: members.join('\n')
+        };
+        this.props.dispatch(save_phonestation(data));
+    },
+
+    modifyAction(row){
+        this.setState({
+            id: row.id,
+            selectNetunit: row.netunitId,
+            selectNetunitName: row.netunit,
+            name: row.name,
+            code: row.code,
+            members: row.members
+        });
+    },
+
+    removeAction(row){
+        let {dispatch} = this.props;
+        dispatch(open_confirm_dialog("删除话务台配置",
+            "确定要删除"+row.netunit+"的话务台配置么?（删除配置不会下载到网元）", () => {
+                dispatch(remove_phonestation(row.id));
+                dispatch(close_confimr_dialog());
+            }))
+    },
+
+    handleChange(prop,value){
+        let newState = {};
+        newState[prop] = value;
+        this.setState(newState);
+    },
+
+    render(){
+        let {name, code, members, selectNetunit, selectNetunitName} = this.state;
+
+        let defaultNetunit;
+        if(selectNetunit>0)
+            defaultNetunit = {text: selectNetunitName, value: selectNetunit};
+        return <BaseConfig title="话务台" configType="phonestation"
+                           configDialogWidth="450" configDialogHeight="550"
+                           model={this.props.model} columns={phoneStationColumn}
+                           defaultNetunit={defaultNetunit}
+                           saveAction={this.saveAction} modifyAction={this.modifyAction}
+                           addAction={this.addAction} removeAction={this.removeAction}>
+            <div className="form-group">
+                <label className="label-4">业务名称</label>
+                <input type="text" className="form-control" value={name} placeholder="不超过20个字符"
+                       onChange={e=>this.handleChange('name',e.target.value)}/>
+            </div>
+            <div className="form-group">
+                <label className="label-4">业务号</label>
+                <input type="number" min="0" max="99999" className="form-control" value={code} placeholder="填写BCD码"
+                       onChange={e=>this.handleChange('code', e.target.value)}/>
+            </div>
+            <div className="form-group">
+                <label className="label-4">成员</label>
+                <UserDataSelect placehoder="点击选择,不超过10个" style={{width: 250,float:'left'}}
+                                value={members} filter={e=>e.userLevel==12 || e.userLevel==13}
+                                onChange={v=>this.handleChange('members', v)}/>
+            </div>
+        </BaseConfig>
+    }
+});
+
+function stateMap(state){
+    let netunitMap = {};
+    state.netUnitConfig.device.forEach(e => {
+        netunitMap[e.id] = e.name;
+    });
+
+    let model = state.outlineConfigs['phonestation'];
+    if(!model)
+        model = [];
+    return {
+        model: model.map(e => {
+            return Object.assign({}, e, {
+                netunitId: e.netunit,
+                netunit: netunitMap[e.netunit],
+                membersText: e.members.join('\n')
+            })
+        })
+    }
+}
+
+export default connect(stateMap)(PhoneStationConfig);

@@ -1,13 +1,15 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import Table from 'rc-table'
+import Select from 'rc-select'
+import Pagination from 'rc-pagination'
 import 'rc-table/assets/bordered.css'
 import 'rc-table/assets/index.css'
 import ConfigDialog from '../../common/component/configdialog.js'
 import Combox from '../../common/component/combox.js'
 import {configOperationMenu, noDataText} from '../../constant/model.js'
 import OperationTrigger from '../../common/container/operationtrigger.js'
-import {download_config, set_config_dialog_visible} from '../../action/config.js'
+import {download_config, set_config_dialog_visible, get_outline_config} from '../../action/config.js'
 import notify from '../../common/component/notification.js'
 
 var BaseConfig = React.createClass({
@@ -17,8 +19,22 @@ var BaseConfig = React.createClass({
             action: 'create',
             dialogVisible: false,
             selectDownload: 'none',
-            downloadAction: 'init'
+            downloadAction: 'init',
+            pageSize: 20,
+            page: 1,
+            totalCount: 0
         }
+    },
+
+    componentWillMount(){
+        let {dispatch, configType} = this.props;
+        let {page, pageSize}= this.state;
+        dispatch(get_outline_config(configType, page, pageSize, totalCount=>{
+            this.setState({
+                pageSize: pageSize,
+                totalCount: totalCount
+            })
+        }));
     },
 
     openDialog(action='create'){
@@ -31,8 +47,8 @@ var BaseConfig = React.createClass({
     },
 
     closeDialog(){
-        let {configType} = this.props;
-        return set_config_dialog_visible(configType, false);
+        let {configType, dispatch} = this.props;
+        return dispatch(set_config_dialog_visible(configType, false));
     },
 
     handleSelect(row,event){
@@ -84,11 +100,37 @@ var BaseConfig = React.createClass({
         }
     },
 
+    onShowSizeChange(current, pageSize){
+        if(current != pageSize){
+            let {dispatch, configType} = this.props;
+            let {page}= this.state;
+            dispatch(get_outline_config(configType, page, pageSize, totalCount=>{
+                this.setState({
+                    pageSize: pageSize,
+                    totalCount: totalCount
+                })
+            }));
+        }
+    },
+
+    onPageChange(page){
+        if(page!=this.state.page){
+            let {dispatch, configType} = this.props;
+            dispatch(get_outline_config(configType, page, this.state.pageSize, totalCount=>{
+                this.setState({
+                    page: page,
+                    pageSize: this.state.pageSize,
+                    totalCount: totalCount
+                })
+            }));
+        }
+    },
+
     render(){
 
         let {title, netunit, model, columns, defaultNetunit, dialogVisible,
             configDialogWidth, configDialogHeight, selectNetunit, configType} = this.props;
-        let {action, downloadAction, selectDownload} = this.state;
+        let {action, downloadAction, selectDownload, page, pageSize, totalCount} = this.state;
 
         let canCreateNetUnit = netunit.filter(e => {
             let index = model.findIndex(m => m.netunit == e.value);
@@ -142,6 +184,15 @@ var BaseConfig = React.createClass({
                        })}
                        emptyText={noDataText}
                 />
+                <Pagination
+                    selectComponentClass={Select}
+                    showTotal={(total) => `一共 ${total} 条数据`}
+                    pageSizeOptions={['10','20','50','100']}
+                    showQuickJumper showSizeChanger
+                    defaultPageSize={pageSize}
+                    current={page}
+                    onChange={this.onPageChange}
+                    onShowSizeChange={this.onShowSizeChange} total={totalCount} />
             </div>
             <ConfigDialog width={configDialogWidth} height={configDialogHeight}
                 visible={visible}

@@ -17,15 +17,17 @@ import ClockConfig from './config/container/clockconfig.js'
 import MeetingConfig from './config/container/meetingconfig.js'
 import TonglingConfig from './config/container/tonglingconfig.js'
 import DigitalTrunk from './config/container/digitaltrunk.js'
+import TimeConfig from './config/container/timeconfig.js'
+import UserDataConfig from './config/container/userdataconfig.js'
+import BroadcastConfig from './config/container/broadcastconfig.js'
+import PhoneStationConfig from './config/container/phonestationconfig.js'
 import SysLog from './syslog/index.js'
 import NetworkConfig from './config/container/network.js'
-import DeviceList from './config/container/device.js'
+import DeviceConfig from './config/container/device.js'
 import UserManage from './sysmanage/user.js'
 import RoleManage from './sysmanage/role.js'
 import ModifyPassword from './sysmanage/modifypassword.js'
-import {get_all_card_type, get_clock_config,
-    get_meeting_config, get_tongling_config,
-    get_digittrunk_config} from './action/config.js'
+import {get_all_card_type, get_number_entry} from './action/config.js'
 import {fetch_net_state, fetch_device_state,
     fetch_card_state, set_timer, clear_timer,
     fetch_business, fetch_business_data,
@@ -54,16 +56,21 @@ const func = [
         listener: (active) => {
             if(active){
                 let state = store.getState();
-                if(state.ui.card.visible){
+                if(state.ui.card.active == 1){
                     let netunit = state.ui.card.netunit.id;
                     store.dispatch(fetch_card_state(netunit));
                     store.dispatch(set_timer(setInterval(function () {
                         store.dispatch(fetch_card_state(netunit));
                     }, REFRESH_INTERVAL)));
-                }else {
+                }else if(state.ui.card.active == 0){
                     store.dispatch(fetch_net_state());
                     store.dispatch(set_timer(setInterval(function () {
                         store.dispatch(fetch_net_state());
+                    }, REFRESH_INTERVAL)));
+                }else if(state.ui.card.active == 2){
+                    store.dispatch(fetch_device_state(state.ui.card.netunit));
+                    store.dispatch(set_timer(setInterval(function () {
+                        store.dispatch(fetch_device_state(state.ui.card.netunit));
                     }, REFRESH_INTERVAL)));
                 }
             }
@@ -109,48 +116,49 @@ const func = [
     },
     {
         path: [1,1],
-        content: <DeviceList/>,
+        content: <UserDataConfig/>,
         listener: clearTimer
     },
     {
         path: [1,2],
-        content: <DigitalTrunk/>,
-        listener: (active) =>{
-            if(active){
-                store.dispatch(get_digittrunk_config());
-                store.dispatch(clear_timer());
-            }
-        }
+        content: <DeviceConfig/>,
+        listener: clearTimer
     },
     {
         path: [1,3],
         content: <ClockConfig/>,
-        listener: (active) => {
-            if(active){
-                store.dispatch(get_clock_config());
-                store.dispatch(clear_timer());
-            }
-        }
+        listener: clearTimer
     },
     {
         path: [1,4],
-        content: <MeetingConfig/>,
-        listener: (active) => {
-            if(active) {
-                store.dispatch(get_meeting_config());
-                store.dispatch(clear_timer());
-            }
-        }
+        content: <TimeConfig/>,
+        listener: clearTimer
     },
     {
         path: [1,5],
+        content: <DigitalTrunk/>,
+        listener: clearTimer
+    },
+
+    {
+        path: [1,6],
+        content: <MeetingConfig/>,
+        listener: clearTimer
+    },
+    {
+        path: [1,7],
         content: <TonglingConfig/>,
-        listener: (active) => {
-            if(active){
-                store.dispatch(get_tongling_config());
-                store.dispatch(clear_timer());
-            }
-        }
+        listener: clearTimer
+    },
+    {
+        path: [1,8],
+        content: <BroadcastConfig/>,
+        listener: clearTimer
+    },
+    {
+        path: [1,9],
+        content: <PhoneStationConfig/>,
+        listener: clearTimer
     },
     {
         path: [4,0],
@@ -314,6 +322,7 @@ var App = React.createClass({
 });
 store.dispatch(get_all_card_type());
 store.dispatch(get_all_role());
+store.dispatch(get_number_entry());
 
 ReactDOM.render(
     <Provider store={store}>

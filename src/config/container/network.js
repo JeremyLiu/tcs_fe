@@ -28,9 +28,12 @@ const menu = [
 var NetworkConfig = React.createClass({
 
     handleClick(e,index,node,event){
-        this.props.dispatch(
-            Action.get_card_list(e, data => this.props.dispatch(Action.open_card_config_dialog(data))));
-        this.refs.popup.popoff();
+        switch(node.type) {
+            case 'netunit':
+            this.props.dispatch(
+                    Action.get_card_list(e, data => this.props.dispatch(Action.open_card_config_dialog(data))));
+                this.refs.popup.popoff(); break;
+        }
     },
 
     handleRightClick(e, index, node, event){
@@ -59,6 +62,8 @@ var NetworkConfig = React.createClass({
     },
 
     render(){
+        let width = $(window).width()*0.8;
+        let height = $(window).height()*0.8;
         return (
             <div>
                 <SwitchView active={this.props.active}>
@@ -68,9 +73,8 @@ var NetworkConfig = React.createClass({
                                     onClick={()=> this.props.dispatch(Action.open_add_dialog())}>新增网元</button>
                             <button className="btn btn-default compact-inline"
                                     onClick={()=> this.props.dispatch(Action.open_connect_dialog())}>新建连接</button>
-                            <button className="btn btn-default">导入配置</button>
                         </div>
-                        <PhysicTopo width="1000" height="600" model={this.props.device}
+                        <PhysicTopo width={width} height={height} model={this.props.device}
                                     connect = {this.props.connect}
                                     stageClick = {() => this.refs.popup.popoff()}
                                     onClick={this.handleClick}

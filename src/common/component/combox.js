@@ -1,11 +1,11 @@
 import React, { Component, PropTypes } from 'react'
-import Select, {Option, OptGroup} from 'rc-select';
 import 'rc-select/assets/index.css';
 
 var Combox = React.createClass({
 
     getInitialState(){
         let {defaultValue} = this.props;
+        defaultValue =  this.findDefaultSelect(defaultValue);
         return {
           value: defaultValue instanceof Object ? defaultValue.text : defaultValue,
           select: defaultValue instanceof Object ? defaultValue : {}
@@ -23,15 +23,15 @@ var Combox = React.createClass({
     },
 
     handleSelect(e,index,event){
+        if(e.value != this.state.value) {
+            let value = event.target.text;
+            this.setState({
+                value,
+                select: e
+            });
 
-        let value = event.target.text;
-        this.setState({
-            value,
-            select: e
-        });
-
-
-        this.props.onSelect(e,index);
+            this.props.onSelect(e, index);
+        }
     },
 
     getSelect(){
@@ -44,6 +44,14 @@ var Combox = React.createClass({
             value: defaultValue instanceof Object ? defaultValue.text : defaultValue,
             select: defaultValue instanceof Object ? defaultValue : {}
         });
+    },
+
+    findDefaultSelect(defaultValue){
+        let {model} = this.props;
+        for(var i=0 ;i< model.length;i++)
+            if(defaultValue == model[i].value)
+                return model[i];
+        return defaultValue;
     },
 
     componentWillReceiveProps(nextProps){
@@ -60,11 +68,13 @@ var Combox = React.createClass({
         if( typeof defaultValue != typeof this.props.defaultValue ||
             (defaultValue instanceof String && defaultValue != this.props.defaultValue) ||
             (defaultValue instanceof Object && defaultValue.value != this.props.defaultValue.value)
-            || change)
-        this.setState({
-            value: defaultValue instanceof Object ? defaultValue.text : defaultValue,
-            select: defaultValue instanceof Object ? defaultValue : {}
-        });
+            || change) {
+            defaultValue =  this.findDefaultSelect(defaultValue);
+            this.setState({
+                value: defaultValue instanceof Object ? defaultValue.text : defaultValue,
+                select: defaultValue instanceof Object ? defaultValue : {}
+            });
+        }
     },
 
     render(){

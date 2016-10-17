@@ -22,8 +22,8 @@ export const statusColor = {
         label: "故障"
     },
     [STATUS_NETWORK_ERROR]: {
-        color: "yellow",
-        rgbColor: "255,255,0",
+        color: "rgb(249,168,26)",
+        rgbColor: "249,168,26",
         label: "网络故障"
     }
 };

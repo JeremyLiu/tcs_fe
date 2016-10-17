@@ -13,6 +13,12 @@ var RadioGroup = React.createClass({
         }
     },
 
+    getInitialState(){
+        return {
+            select: this.props.defaultSelect
+        }
+    },
+
     getSelect(){
         return this.select;
     },
@@ -30,8 +36,15 @@ var RadioGroup = React.createClass({
         }
     },
 
+    componentWillReceiveProps(){
+        
+    },
+
     handleChange(model,index){
         this.select = model;
+        this.setState({
+            select: index
+        });
         if(this.props.selectChanged)
             this.props.selectChanged(model,index);
     },
@@ -44,13 +57,14 @@ var RadioGroup = React.createClass({
                             <input  name={this.props.name}
                                     onClick={this.handleChange.bind(this, model,index)}
                                     type="radio"
+                                    checked={this.state.select == index? 'checked':''}
                                     defaultChecked={index == this.props.defaultSelect? "checked":""}
                                     />
                             <label>{model.text}</label>
                         </span>
             });
         }
-        return <div className="radio-group">
+        return <div className={this.props.className + " radio-group"}>
             {radios}
         </div>
     }

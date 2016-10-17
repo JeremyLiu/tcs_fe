@@ -4,6 +4,7 @@ import {logColumns ,noDataText} from '../constant/model.js'
 import Select from 'rc-select'
 import Pagination from 'rc-pagination'
 import Table from 'rc-table'
+import TimeShortcut from '../common/component/timeshortcut.js'
 import {get_log, remove_log} from '../action/log.js'
 import {open_confirm_dialog, close_confimr_dialog} from '../action/config.js'
 import 'rc-pagination/assets/index.css'
@@ -38,6 +39,7 @@ var SysLog = React.createClass({
     refreshData(){
         let {startDate, endDate, search} = this.refs;
         let {dispatch, pageSize} = this.props;
+        this.setState({select:[]});
         dispatch(get_log(1, pageSize, startDate.value, endDate.value, search.value));
     },
 
@@ -74,6 +76,12 @@ var SysLog = React.createClass({
         }))
     },
 
+    handleTimeShortcut(d){
+        let {search} = this.refs;
+        let {dispatch, page, pageSize} = this.props;
+        dispatch(get_log(page, pageSize, d, '', search.value));
+    },
+
     render: function () {
         return(
             <div>
@@ -89,6 +97,7 @@ var SysLog = React.createClass({
                                className="form-control form-date compact-inline"
                                defautValue="" />
                     </div>
+                    <TimeShortcut onChange={this.handleTimeShortcut}/>
                     <div className="form-group">
                         <input ref="search" type="text" className="form-control compact-inline" placeholder="搜索操作用户,模块,操作内容"/>
                     </div>

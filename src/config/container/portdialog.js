@@ -10,7 +10,9 @@ var DevicePortDialog = React.createClass({
     getInitialState(){
       return {
           id: this.props.id,
-          name: this.props.name
+          number: this.props.number,
+          name: this.props.name,
+          enable: this.props.enable
       }
     },
 
@@ -19,50 +21,54 @@ var DevicePortDialog = React.createClass({
         if(!nextProps.visible || !this.props.visible)
             this.setState({
                 id: nextProps.id,
-                name: nextProps.name
+                name: nextProps.name,
+                enable: nextProps.enable,
+                number: nextProps.number
             })
     },
 
-    handlePortChange(event){
-      this.setState({
-         id: event.target.value
-      });
-    },
-
-    handleNameChange(event){
-      this.setState({
-          name: event.target.value
-      })
+    handleChange(prop,value){
+        let newState = {};
+        newState[prop] = value;
+        this.setState(newState);
     },
 
     handleClick(){
         let {action, deviceId, dispatch} = this.props;
-        let {id, name} = this.state;
+        let {enable, name, number} = this.state;
         if(action == 'create')
-            dispatch(post_add_device_port(parseInt(id),deviceId,name));
+            dispatch(post_add_device_port(number,deviceId,name, enable));
         else
-            dispatch(post_modify_device_port(this.props.id, deviceId, parseInt(id), name));
+            dispatch(post_modify_device_port(this.props.id, deviceId, number, name, enable));
     },
 
     render(){
+        let {number, name, enable} = this.state;
         return <ConfigDialog visible={this.props.visible}
-                             width="450" height="200" title="添加端口配置"
+                             width="350" height="200" title="添加端口配置"
                              cancelAction={close_device_port_dialog()}
                              onSave={this.handleClick}>
             <form className="form-horizontal">
                 <div className="form-group">
                     <label className="label-4">端口号</label>
-                    <input className="form-control" type="text"
-                           value={this.state.id}
-                           placeholder="必填,数字"
-                           onChange={this.handlePortChange}/>
+                    <input className="form-control" type="number" min="0" max="99999"
+                           value={number}
+                           placeholder="填写BCD码"
+                           onChange={e=>this.handleChange('number', e.target.value)}/>
                 </div>
                 <div className="form-group">
-                    <label className="label-4">功能</label>
+                    <label className="label-4">是否启用</label>
+                    <input className="left-float" type="checkbox"
+                           checked={enable}
+                           placeholder="填写BCD码"
+                           onChange={e=>this.handleChange('enable',e.target.checked)}/>
+                </div>
+                <div className="form-group">
+                    <label className="label-6">功能</label>
                     <input className="form-control" type="text"
-                           value={this.state.name}
-                           placeholder="必填,不超过60个字符"
-                           onChange={this.handleNameChange}/>
+                           value={name}
+                           placeholder="不超过60个字符"
+                           onChange={e=>this.handleChange('name', e.target.value)}/>
                 </div>
             </form>
         </ConfigDialog>

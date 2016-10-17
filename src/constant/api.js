@@ -16,16 +16,18 @@ export const GET_DEVICE_STATE = "device/state";
 export const CREATE_DEVICE = "device/create";
 export const MODIFY_DEVICE = "device/modify";
 export const REMOVE_DEVICE = "device/remove";
-
+export const GET_DEVICE_CONFIG = 'device/config/';
 export const GET_DEVICE_PORT = "device/port";
 export const CREATE_DEVICE_PORT = "device/port/create";
 export const MODIFY_DEVICE_PORT = "device/port/modify";
 export const REMOVE_DEVICE_PORT = "device/port/remove";
 
 export const DOWNLOAD_CONFIG = 'config/download/';
+export const DOWNLOAD_DEVICE_CONFIG = 'config/download/device/';
 export const GET_OUTLINE_CONFIG = "config/";
 export const REMOVE_OUTLINE_CONFIG = "config/remove/";
 export const SAVE_OUTLINE_CONFIG = "config/save/";
+export const FETCH_NUMBER_ENTRY = "config/numberentry";
 
 export const GET_BUSINESS = 'business';
 export const GET_BUSISNESS_DATA = 'business/list';

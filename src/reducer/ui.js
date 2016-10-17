@@ -14,7 +14,7 @@ const initElement = {
 };
 
 const initCard = {
-    visible: false,
+    active: 0,
     card: [],
     state: [],
     netunit:{}
@@ -41,14 +41,17 @@ const initDevice = {
     id: 0,
     name: '',
     netunit: -1,
+    code: '',
     action: 'create'
 };
 
 const initDevicePort = {
     visible: false,
-    id: '',
+    id: 0,
     name: '',
+    number:'',
     deviceId: 0,
+    enable: true,
     action: 'create'
 };
 
@@ -161,7 +164,7 @@ function card(state=initCard, action){
     switch(action.type){
         case Network.OPEN_CARD_DIALOG:
             return Object.assign({},state,{
-                visible: true,
+                active: 1,
                 card: action.card,
                 netunit: action.netunit,
                 select: 0
@@ -178,6 +181,12 @@ function card(state=initCard, action){
             return newState;
         case Network.CLOSE_CARD_DIALOG:
             return initCard;
+        case Config.SET_DEVICE:
+            if(action.netunit>0)
+                return Object.assign({}, state, {
+                    active: 2,
+                    netunit: action.netunit
+                });
         default:
             return state
     }
@@ -212,6 +221,7 @@ function deviceDialog(state = initDevice, action){
                     id: action.data.id,
                     name: action.data.name,
                     netunit: action.data.netUnitId,
+                    code: action.data.code,
                     visible: true
                 });
         case Config.CLOSE_DEVICE_DIALOG:
@@ -233,6 +243,8 @@ function devicePortDialog(state = initDevicePort, action){
                 return Object.assign({},state,{
                     action: action.action,
                     id: action.data.id,
+                    number: action.data.number,
+                    enable: action.data.enable,
                     deviceId: action.deviceId,
                     name: action.data.function,
                     visible: true

@@ -2,12 +2,14 @@ import React from 'react'
 import {connect} from 'react-redux'
 import PhysicTopo from './../../common/component/physictopo.js'
 import CardDialog from './carddialog.js'
-import NetworkStatusBar, {STATUS_UNKNOWN,statusColor} from '../component/networkstatusbar.js'
+import {DeviceNetunitState} from './devicemonitor.js'
+import RefreshButton from '../component/refreshbutton.js'
+import NetworkStatusBar, {STATUS_UNKNOWN,STATUS_NORMAL,
+    STATUS_ERROR, STATUS_NETWORK_ERROR, statusColor} from '../component/networkstatusbar.js'
 import SwitchView from '../../common/component/switchview.js'
-import {open_card_dialog} from '../../action/network.js'
-import {refresh_config, get_card_list} from '../../action/config.js'
-import {set_timer, fetch_net_state, close_card_dialog} from '../../action/network.js'
-import {REFRESH_INTERVAL} from '../../constant/model.js'
+import {refresh_config, get_card_list, fetch_device} from '../../action/config.js'
+import {set_timer, fetch_net_state, close_card_dialog,open_card_dialog, fetch_card_state} from '../../action/network.js'
+import {REFRESH_INTERVAL, paramConfig, cloudImg} from '../../constant/model.js'
 
 var NetworkMonitor = React.createClass({
 
@@ -19,9 +21,29 @@ var NetworkMonitor = React.createClass({
         n.fillColor = statusColor[e.state].rgbColor;
     },
 
-    renderDeviceState(e,n,l){
-        l.strokeColor = statusColor[e.state].rgbColor;
+    renderDeviceState(e,n){
+        n.fillColor = statusColor[e.state].rgbColor;
+    },
+    
+    renderCloudState(e,n){
+        let normal=0,fail=0, outline=0, unknown=0;
+        for(var i=0; i<e.devices.length;i++){
+            switch(e.devices[i].state){
+                case STATUS_NORMAL: normal++; break;
+                case STATUS_ERROR: fail++; break;
+                case STATUS_NETWORK_ERROR: outline++; break;
+                default: unknown++;
+            }
+        }
+        let state = e.state;
+        if(fail>0)
+            state = STATUS_ERROR;
+        else if(normal>0)
+            state = STATUS_NORMAL;
 
+        n.setImage(cloudImg[state], false);
+        n.fontColor = '0.0.0';
+        n.text='正常'+normal+', 故障'+fail+', 网络故障'+outline+', 未知'+unknown;
     },
 
     componentDidUpdate(){
@@ -33,11 +55,24 @@ var NetworkMonitor = React.createClass({
     },
 
     handleNodeClick(e, index, node, event){
-        this.props.dispatch(get_card_list(e,
-            (data) => this.props.dispatch(open_card_dialog(data))))
+        let {dispatch} = this.props;
+        switch(node.type){
+            case 'netunit': dispatch(get_card_list(e,
+                (data) => {
+                    dispatch(open_card_dialog(data));
+                    dispatch(fetch_card_state(e.id));
+                    dispatch(set_timer(setInterval(function () {
+                        dispatch(fetch_card_state(e.id));
+                    }, REFRESH_INTERVAL)));
+                })); break;
+            case 'container': dispatch(fetch_device(node.netunit)); break;
+        }
+
     },
 
     render: function () {
+        let width = $(window).width()*0.8;
+        let height = $(window).height()*0.8;
         return(
             <div>
                 <div>
@@ -53,17 +88,21 @@ var NetworkMonitor = React.createClass({
                                 dispatch(close_card_dialog())}
 
                             }>返回</button>
+                    <RefreshButton className="left-float" style={{marginLeft: 80}} api="network/refresh"/>
                     <NetworkStatusBar/>
                 </div>
                 <SwitchView active={this.props.active}>
                     <PhysicTopo ref="topo"
-                        width="1000" height="600" model={this.props.netunit}
+                        width={width} height={height} deviceLimitCount={paramConfig.deviceLimitCount}
+                                model={this.props.netunit}
                                 connect = {this.props.connect}
                                 adapter = {this.renderNodeState}
                                 deviceAdapter = {this.renderDeviceState}
                                 connectAdapter = {this.renderConnectState}
+                                containerAdapter = {this.renderCloudState}
                                 onClick={this.handleNodeClick}/>
                     <CardDialog/>
+                    <DeviceNetunitState />
                 </SwitchView>
             </div>
         )
@@ -98,7 +137,8 @@ function stateMap(state){
     return {
         netunit,
         connect,
-        active: state.ui.card.visible?1:0
+        active: state.ui.card.active,
+        deviceNetunit: state.ui.card.netunit
     };
 }
 

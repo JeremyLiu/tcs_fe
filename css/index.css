@@ -7,6 +7,9 @@ body{
 th, td{
 	text-align: center;
 }
+a{
+	cursor: pointer;
+}
 .navbar{
 	height: 40px;
 }
@@ -45,7 +48,16 @@ th, td{
 
 input[type=text], input[type=password]{
 	min-width: 150px;
-	max-width: 300px;
+	max-width: 250px;
+}
+
+input[type=number]{
+	min-width: 30px;
+	max-width: 120px;
+}
+
+.time-input{
+	border-radius: 4px;
 }
 
 .compact{
@@ -65,6 +77,10 @@ input[type=text], input[type=password]{
 	margin: 5px 20px;
 	float: left;
 
+}
+.label-nm-3{
+	width: 120px;
+	float: left;
 }
 
 .label-4{
@@ -175,7 +191,8 @@ input[type=text], input[type=password]{
 	display:inline;
 }
 .wrap-width{
-	width: 900px;
+	min-width: 900px;
+	width: 85%;
 }
 
 .error-wrap{
@@ -234,6 +251,27 @@ input[type=text], input[type=password]{
 	background-color: yellow;
 }
 
+.table-list{
+	text-overflow: ellipsis;
+	padding-left: 8px;
+	padding-bottom: 2px;
+}
+
+.table-list-item{
+	float: left;
+	background-color: #f3f3f3;
+	border-radius: 4px;
+	padding: 0 15px;
+	margin-right: 4px;
+	overflow: hidden;
+	position: relative;
+}
+
+.list-height-2{
+	margin-top: 4px;
+	height: 40px;
+	line-height: 20px;
+}
 
 #message-box-modal {
 	z-index: 50000

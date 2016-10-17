@@ -6,6 +6,7 @@ import {fetch_record, play_record, remove_record, search_record_data} from '../a
 import {open_confirm_dialog} from '../action/config.js'
 import Player from './player.js'
 import OperationTrigger from '../common/container/operationtrigger.js'
+import TimeShortcut from '../common/component/timeshortcut.js'
 
 var Record = React.createClass({
 
@@ -39,6 +40,12 @@ var Record = React.createClass({
         dispatch(search_record_data(startDate.value, endDate.value, searchKey.value));
     },
 
+    handleTimeShortcut(d){
+        let {searchKey} = this.refs;
+        let {dispatch} = this.props;
+        dispatch(search_record_data(d, '', searchKey.value));
+    },
+
     render(){
         return <div>
             <Player/>
@@ -54,6 +61,7 @@ var Record = React.createClass({
                            className="form-control form-date compact-inline"
                            defautValue="" />
                 </div>
+                <TimeShortcut onChange={this.handleTimeShortcut}/>
                 <div className="form-group">
                     <input ref="searchKey" type="text" className="form-control compact-inline" placeholder="输入主叫/被叫号码查询"/>
                 </div>

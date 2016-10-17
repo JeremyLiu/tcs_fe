@@ -17,6 +17,7 @@ var GridView = React.createClass({
             float: 'left',
             defaultSelect: -1,
             onClick: ()=>{},
+            sizeAdapter: (size,model,index) => {},
             adapter: (model, index) => {}
         }
     },
@@ -30,13 +31,15 @@ var GridView = React.createClass({
 
     render(){
         let gridView = this.props.data.map((model, index) => {
-            return <div style={
-            {
+            let sizeMeasure = {
                 width: this.props.gridWidth,
                 height: this.props.gridHeight,
                 margin: this.props.cellSpace,
                 float: this.props.float
-            }} className={this.state.select==index? "grid grid-select":"grid"}
+            };
+            this.props.sizeAdapter(sizeMeasure, model, index);
+            return <div style={sizeMeasure}
+                        className={this.state.select==index? "grid grid-select":"grid"}
             onClick={this.handleClick.bind(this, model, index)}>
                 {this.props.adapter(model, index)}
                 </div>
@@ -55,6 +58,7 @@ GridView.PropTypes={
     data: PropTypes.array.isRequired,
     adapter: PropTypes.func.isRequired,
     onClick: PropTypes.func.isRequired,
+    sizeAdapter: PropTypes.func.isRequired,
     float: PropTypes.oneOf(['left,right'])
 };
 

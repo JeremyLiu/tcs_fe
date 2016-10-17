@@ -4,7 +4,7 @@ import BaseConfig from '../component/baseconfig.js'
 import PortSelect from '../component/portselect.js'
 import {clockConfigColumns} from '../../constant/model.js'
 import {open_confirm_dialog, close_confimr_dialog,
-        remove_clock_config, save_clock, download_clock} from '../../action/config.js'
+        remove_clock_config, save_clock} from '../../action/config.js'
 
 var ClockConfig = React.createClass({
     

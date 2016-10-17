@@ -1,6 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import BaseConfig from '../component/baseconfig.js'
+import UserDataSelect from '../component/usernumberselect.js'
 import {tonglingConfigColumn} from '../../constant/model.js'
 import {open_confirm_dialog, close_confimr_dialog,
     remove_tongling_config, save_tongling} from '../../action/config.js'
@@ -13,9 +14,9 @@ var TonglingConfig = React.createClass({
             selectNetunit: -1,
             name: '',
             code: '',
-            users: '',
-            members: '',
-            commanders: ''
+            users: [],
+            members: [],
+            commanders: []
         }
     },
 
@@ -30,9 +31,8 @@ var TonglingConfig = React.createClass({
             netunit: select.value,
             name: name,
             code: code,
-            users: users,
-            members: members,
-            commanders: commanders
+            users: users.join('\n'),
+            members: members.join('\n'),
         };
         this.props.dispatch(save_tongling(data));
     },
@@ -46,7 +46,6 @@ var TonglingConfig = React.createClass({
             code: row.code,
             users: row.users,
             members: row.members,
-            commanders: row.commanders
         });
     },
 
@@ -59,9 +58,9 @@ var TonglingConfig = React.createClass({
             }))
     },
 
-    handleChange(prop,e){
+    handleChange(prop,value){
         let newState = {};
-        newState[prop] = e.target.value;
+        newState[prop] = value;
         this.setState(newState);
     },
 
@@ -79,33 +78,28 @@ var TonglingConfig = React.createClass({
                            saveAction={this.saveAction} modifyAction={this.modifyAction}
                            addAction={this.addAction} removeAction={this.removeAction}>
             <div className="form-group">
-                <label className="label-4">名称</label>
-                <input type="text" className="form-control" value={name} placeholder="填写BCD码"
-                       onChange={this.handleChange.bind(this, 'name')}/>
+                <label className="label-4">业务名称</label>
+                <input type="text" className="form-control" value={name} placeholder="不超过20个字符"
+                       onChange={e=>this.handleChange('name', e.target.value)}/>
             </div>
             <div className="form-group">
-                <label className="label-4">编号</label>
-                <input type="text" className="form-control" value={code} placeholder="填写BCD码"
-                       onChange={this.handleChange.bind(this, 'code')}/>
+                <label className="label-4">业务号</label>
+                <input type="number" min="0" max="99999" className="form-control" value={code} placeholder="填写BCD码"
+                       onChange={e=>this.handleChange('code', e.target.value)}/>
             </div>
             <div className="form-group">
-                <label className="label-4">用户</label>
-                <textarea style={{width: 180, height:120}} className="form-control"
-                          value={users} placeholder="用换行分隔"
-                          onChange={this.handleChange.bind(this, 'users')}/>
+                <label className="label-4">有权用户</label>
+                <UserDataSelect placehoder="点击选择,不超过10个" style={{width: 250,float:'left'}}
+                                value={users} filter={e=>e.userLevel<12}
+                                onChange={v=>this.handleChange('users', v)}/>
             </div>
             <div className="form-group">
-                <label className="label-4">成员</label>
-                <textarea style={{width: 180, height:120}} className="form-control"
-                          value={members} placeholder="用换行分隔"
-                          onChange={this.handleChange.bind(this, 'members')}/>
+                <label className="label-4">战位成员</label>
+                <UserDataSelect placehoder="点击选择,不超过40个" style={{width: 250,float:'left'}}
+                                value={members} filter={e=>e.userLevel<12}
+                                onChange={v=>this.handleChange('members', v)}/>
             </div>
-            <div className="form-group">
-                <label className="label-4">指挥</label>
-                <textarea style={{width: 180, height:120}} className="form-control"
-                          value={commanders} placeholder="用换行分隔"
-                          onChange={this.handleChange.bind(this, 'commanders')}/>
-            </div>
+
         </BaseConfig>
     }
 });
@@ -124,9 +118,9 @@ function stateMap(state){
             return Object.assign({}, e, {
                 netunitId: e.netunit,
                 netunit: netunitMap[e.netunit],
-                users: e.users.join('\n'),
-                members: e.members.join('\n'),
-                commanders: e.commanders.join('\n')
+                usersText: e.users.join('\n'),
+                membersText: e.members.join('\n'),
+                commandersText: e.commanders.join('\n')
             })
         })
     }

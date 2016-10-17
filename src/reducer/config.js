@@ -73,19 +73,31 @@ export function deviceConfig(state = [], action){
                     id:action.id,
                     netUnitId: action.netunit,
                     name: action.name,
+                    code: action.code,
                     netUnitName:action.netUnitName
                 }
             ];
         case Action.MODIFY_DEVICE_SUCCESS:
-            let newState = state.concat();
+            let newState = state.concat([]);
             newState.forEach(e => {
                if(e.id == action.id){
                    e.name = action.name;
+                   e.code = action.code;
                    e.netUnitId = action.netunit;
                    e.netUnitName = action.netUnitName;
                }
             });
-            return newState;
+            return state.map(e=>{
+                if(e.id == action.id)
+                    return Object.assign({},e,{
+                        name: action.name,
+                        code: action.code,
+                        netUnitId: action.netunit,
+                        netUnitName: action.netUnitName
+                    });
+                else
+                    return e
+            });
         case Action.REMOVE_DEVICE:
             return state.filter(e => e.id != action.id);
         default:
@@ -117,10 +129,11 @@ export function devicePort(state = initPort, action){
                     device: state.device,
                     ports: state.ports.map(e => {
                         if(e.id == action.id)
-                            return {
-                                id: action.number,
-                                function: action.name
-                            };
+                            return Object.assign({}, e, {
+                                number: action.number,
+                                function: action.name,
+                                enable: action.enable
+                            });
                         else
                             return e;
                     })

@@ -68,6 +68,12 @@ export function play_record(id,recording = false){
     }
 }
 
+export function get_api(api, callback){
+    return (dispatch) => fetch(api,{
+        credentials: "same-origin"
+    }).then(response).then(callback);
+}
+
 export function fetch_net_state(){
     return (dispatch) => fetch(API.GET_TOPO_STATE,{
         credentials: "same-origin"
@@ -92,6 +98,10 @@ export function fetch_card_state(netunit){
         .then(data => {
             if(data.status == 0){
                 data = data.data;
+                if(data.state == 1 || data.state == 2)
+                    data.cardStates[0].state = 1;
+                else
+                    data.cardStates[0].state = 0;
                 dispatch({
                     type: SET_CARD_STATE,
                     netunit: data.state,
@@ -101,8 +111,10 @@ export function fetch_card_state(netunit){
         })
 }
 
-export function fetch_device_state(){
-    return (dispatch) => fetch(API.GET_DEVICE_STATE,{
+export function fetch_device_state(netunit=0){
+    const url = API.GET_DEVICE_STATE + "?netunit="+netunit;
+
+    return (dispatch) => fetch(url,{
         credentials: "same-origin"
     }).then(response)
         .then(data => {

@@ -77,7 +77,7 @@ var ElementDialog = React.createClass({
             [
               <button
                 type="button"
-                className="btn btn-default"
+                className="btn btn-default compact-inline"
                 key="close"
                 onClick={this.onCancel}
               >

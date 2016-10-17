@@ -1,5 +1,6 @@
 import React, {PropTypes} from 'react'
 import {connect} from 'react-redux'
+import UserDataSelect from '../component/usernumberselect.js'
 import {close_device_dialog, post_add_device, post_modify_device} from '../../action/config.js'
 import ConfigDialog from '../../common/component/configdialog.js'
 import Combox from '../../common/component/combox.js'
@@ -8,14 +9,16 @@ var DeviceDialog = React.createClass({
 
     getInitialState(){
         return {
-            name: this.props.name
+            name: this.props.name,
+            code: this.props.code
         };
     },
 
     componentWillReceiveProps(nextProps){
         if(!nextProps.visible || !this.props.visible)
             this.setState({
-                name: nextProps.name
+                name: nextProps.name,
+                code: nextProps.code
             })
     },
 
@@ -25,16 +28,17 @@ var DeviceDialog = React.createClass({
 
     handleClick(){
         let netunit = this.refs.netunit.getSelect();
+        let {name,code} = this.state;
         if(this.props.action == 'create')
-            this.props.dispatch(post_add_device(netunit.value,this.state.name,netunit.text));
+            this.props.dispatch(post_add_device(netunit.value, name, code, netunit.text));
         else
-            this.props.dispatch(post_modify_device(this.props.id,netunit.value, this.state.name,netunit.text));
+            this.props.dispatch(post_modify_device(this.props.id,netunit.value,name,code,netunit.text));
     },
 
-    handleNameChange(event){
-        this.setState({
-            name: event.target.value
-        })
+    handleChange(prop,value){
+        let newState = {};
+        newState[prop] = value;
+        this.setState(newState);
     },
 
     render(){
@@ -57,7 +61,13 @@ var DeviceDialog = React.createClass({
                     <input className="form-control" type="text"
                            value={this.state.name}
                            placeholder="必填,不超过60个字符"
-                           onChange={this.handleNameChange}/>
+                           onChange={e=>this.handleChange('name',e.target.value)}/>
+                </div>
+                <div className="form-group">
+                    <label className="label-4">终端号码</label>
+                    <UserDataSelect placehoder="点击选择" multiple={false}
+                                    style={{width: 120,float:'left'}} value={this.state.code} 
+                                    onChange={v=>this.handleChange('code', v)}/>
                 </div>
             </form>
         </ConfigDialog>

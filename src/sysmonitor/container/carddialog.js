@@ -8,8 +8,9 @@ import {REFRESH_INTERVAL, noDataText} from "../../constant/model.js"
 import Table from 'rc-table'
 import {fetch_card_state, set_timer} from '../../action/network.js'
 
-const space = 5;
+const space = 3;
 const width = 30;
+const powerWidth = 40;
 const height = 120;
 const netUnitSize = 100;
 
@@ -30,16 +31,24 @@ const columns = [
 
 function cardCell(model,index){
     const status = model.state? model.state:NetStatus.STATUS_UNKNOWN;
+    let text = <p>电<br/>源<br/>单<br/>元</p>;
+
     return <div style={{
         backgroundColor: NetStatus.statusColor[status].color,
-        width: width,
+        width: index>0?width:powerWidth,
         fontSize: 18,
         textAlign: 'center',
         height: height,
         cursor: 'pointer'
     }}>
-        {model.name}
+        {index>0?model.name:text}
     </div>
+}
+
+function cardSize(size, model, index) {
+    if(index ==0){
+        size.width = powerWidth;
+    }
 }
 
 var CardDialog = React.createClass({
@@ -89,8 +98,9 @@ var CardDialog = React.createClass({
         const netUnitStatus = this.props.netunit.state ?
             this.props.netunit.state:NetStatus.STATUS_UNKNOWN;
 
-        if(this.props.card)
+        if(this.props.card) {
             slotNum = this.props.card.length;
+        }
         return (
             <div>
                 <div className="center" style={{
@@ -103,9 +113,10 @@ var CardDialog = React.createClass({
                 }}>{this.props.netunit.name}</div>
                     <GridView gridWidth={width} gridHeight={height} cellSpace={space}
                               adapter={cardCell} data={this.props.card}
+                              sizeAdapter={cardSize}
                             onClick={this.handleClick}
                             style={{height:netUnitSize+20,
-                                    width: slotNum*(width+space*2)}}
+                                    width: (slotNum-1)*width+space*2*slotNum+powerWidth}}
                             className="center"/>
                 <Table className="table table-bordered compact-3 center"
                        columns={columns}

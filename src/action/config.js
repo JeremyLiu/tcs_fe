@@ -66,6 +66,7 @@ export const CLOSE_DEVICE_PORT_DIALOG = 'CLOSE_DEVICE_PORT_DIALOG';
 
 export const SET_LOADING = 'SET_LOADING';
 export const SET_OUTLINE_CONFIG = 'SET_OUTLINE_CONFIG';
+export const SET_NUMBER_ENTRY = 'SET_NUMBER_ENTRY';
 export const REMOVE_OUTLINE_CONFIG = 'REMOVE_OUTLINE_CONFIG';
 export const SET_CONFIG_DIALOG_VISIBLE = 'SET_CONFIG_DIALOG_VISIBLE';
 
@@ -289,14 +290,16 @@ export function fetch_element(id, callback){
         })
 }
 
-export function fetch_device(){
-    return (dispatch) => fetch(API.GET_DEVICE,{
+export function fetch_device(netunit=0){
+    const url = API.GET_DEVICE + "?netunit=" + netunit;
+    return (dispatch) => fetch(url, {
         credentials: "same-origin"
     }).then(response)
         .then(data => {
             if(data.status == 0)
                 dispatch({
                     type: SET_DEVICE,
+                    netunit: netunit,
                     data: data.data
                 })
         });
@@ -317,8 +320,29 @@ export function fetch_device_port(deviceId){
         });
 }
 
-function get_outline_config(type){
-    const url = API.GET_OUTLINE_CONFIG + type;
+export function get_outline_config(type, page=1, pageSize=20, callback){
+    const url = API.GET_OUTLINE_CONFIG + type +
+        "?page="+page+"&pagesize="+pageSize;
+    return (dispatch) => fetch(url,{
+        credentials: "same-origin"
+    }).then(response).then(data => {
+        if(data.status == 0){
+            data = data.data;
+            dispatch({
+                type: SET_OUTLINE_CONFIG,
+                configType: type,
+                data: data.result
+            });
+            if(type == 'userdata')
+                dispatch(get_number_entry());
+            if(callback)
+                callback(data.totalCount);
+        }
+    })
+}
+
+export function get_device_config(type, device){
+    const url = API.GET_DEVICE_CONFIG + type + "?number="+device;
     return (dispatch) => fetch(url,{
         credentials: "same-origin"
     }).then(response).then(data => {
@@ -332,10 +356,24 @@ function get_outline_config(type){
     })
 }
 
-export function post_add_device(netunit, name, netUnitName){
+export function get_number_entry(){
+    return (dispatch) => fetch(API.FETCH_NUMBER_ENTRY,{
+        credentials: "same-origin"
+    }).then(response).then(data => {
+        if(data.status == 0){
+            dispatch({
+                type: SET_NUMBER_ENTRY,
+                data: data.data
+            });
+        }
+    })
+}
+
+export function post_add_device(netunit, name, code,netUnitName){
     var form = new FormData();
     form.append('netunit', netunit);
     form.append('name', name);
+    form.append('code',code);
     return (dispatch) => fetch(API.CREATE_DEVICE,{
         method: 'POST',
         credentials: "same-origin",
@@ -348,7 +386,8 @@ export function post_add_device(netunit, name, netUnitName){
                     id: data.data,
                     netunit: netunit,
                     netUnitName: netUnitName,
-                    name: name
+                    name: name,
+                    code: code
                 });
                 dispatch({
                     type: CLOSE_DEVICE_DIALOG
@@ -358,11 +397,12 @@ export function post_add_device(netunit, name, netUnitName){
         })
 }
 
-export function post_modify_device(id,netunit,name, netUnitName){
+export function post_modify_device(id,netunit,name, code,netUnitName){
     var form = new FormData();
     form.append('id',id);
     form.append('netunit', netunit);
     form.append('name', name);
+    form.append('code',code);
     return (dispatch) => fetch(API.MODIFY_DEVICE,{
         method: 'POST',
         credentials: "same-origin",
@@ -375,6 +415,7 @@ export function post_modify_device(id,netunit,name, netUnitName){
                     id: id,
                     netunit: netunit,
                     name: name,
+                    code: code,
                     netUnitName:netUnitName
                 });
                 dispatch({
@@ -407,11 +448,12 @@ export function post_remove_device(id, select){
     })
 }
 
-export function post_add_device_port(id,deviceId,name){
+export function post_add_device_port(number,deviceId,name, enable){
     var form = new FormData();
-    form.append('id', id);
+    form.append('number', number);
     form.append('deviceId', deviceId);
     form.append('function', name);
+    form.append('enable', enable);
     return (dispatch) => fetch(API.CREATE_DEVICE_PORT,{
         method: 'POST',
         credentials: "same-origin",
@@ -422,8 +464,9 @@ export function post_add_device_port(id,deviceId,name){
                 type: ADD_DEVICE_PORT_SUCCESS,
                 deviceId: deviceId,
                 data: {
-                    id: id,
-                    function: name
+                    number: number,
+                    function: name,
+                    enable: enable
                 }
             });
             dispatch({
@@ -434,9 +477,10 @@ export function post_add_device_port(id,deviceId,name){
     })
 }
 
-export function post_modify_device_port(id,deviceId,number,name){
+export function post_modify_device_port(id,deviceId,number,name,enable){
     var form = new FormData();
     form.append('id', id);
+    form.append('enable', enable);
     form.append('number', number);
     form.append('function', name);
     return (dispatch) => fetch(API.MODIFY_DEVICE_PORT, {
@@ -450,6 +494,7 @@ export function post_modify_device_port(id,deviceId,number,name){
                 id: id,
                 number: number,
                 deviceId: deviceId,
+                enable: enable,
                 name: name
             });
             dispatch({
@@ -589,7 +634,7 @@ export function post_modify_card_type(id, type, name){
     )
 }
 
-function save_outline_config(type, data){
+export function save_outline_config(type, data){
     const url = API.SAVE_OUTLINE_CONFIG + type;
     return (dispatch) => fetch(url, {
         method: 'POST',
@@ -615,6 +660,25 @@ export function download_config(type, netunit = 0, callback){
     let url = API.DOWNLOAD_CONFIG + type;
     if(netunit>0)
         url = url + '?netunit=' + netunit;
+    return (dispatch) => fetch(url, {
+        method: 'POST',
+        credentials: "same-origin",
+    }).then(response).then(callback);
+}
+
+export function download_device_config(type, netunit=0, device=0, callback){
+    let url = API.DOWNLOAD_DEVICE_CONFIG + type;
+    url = url + '?netunit=' + netunit + "&device=" + device;
+    return (dispatch) => fetch(url, {
+        method: 'POST',
+        credentials: "same-origin"
+    }).then(response).then(callback);
+}
+
+export function download_time(netunit, time, callback){
+    let url = API.DOWNLOAD_CONFIG + "time?time=" + time;
+    if(netunit>0)
+        url = url + '&netunit=' + netunit;
     return (dispatch) => fetch(url, {
         method: 'POST',
         credentials: "same-origin",
@@ -656,12 +720,36 @@ export function get_digittrunk_config(){
     return get_outline_config('digittrunk');
 }
 
+export function get_user_data_config(){
+    return get_outline_config('userdata');
+}
+
+export function get_broadcast(){
+    return get_outline_config('broadcast');
+}
+
+export function get_phonestation() {
+    return get_outline_config('phonestation');
+}
+
+export function get_terminal_business(number){
+    return get_device_config('terminalbusiness', number);
+}
+
+export function get_terminal_keyconfig(number){
+    return get_device_config('terminalkey', number);
+}
+
 export function save_clock(data){
     return save_outline_config('clock', data);
 }
 
 export function save_meeting(data){
     return save_outline_config('meeting', data);
+}
+
+export function save_user_data(data){
+    return save_outline_config('userdata', data);
 }
 
 export function save_tongling(data){
@@ -672,20 +760,24 @@ export function save_digittrunk(data){
     return save_outline_config('digittrunk', data);
 }
 
+export function save_broadcast(data){
+    return save_outline_config('broadcast', data);
+}
+
+export function save_phonestation(data){
+    return save_outline_config('phonestation', data);
+}
+
+export function save_terminal_business(data){
+    return save_outline_config('terminalbusiness', data);
+}
+
+export function save_terminal_keyconfig(data) {
+    return save_outline_config('terminalkey', data);
+}
+
 export function download_card(netunit = 0){
     return download_config('card', netunit);
-}
-
-export function download_clock(netunit = 0){
-    return download_config('clock', netunit);
-}
-
-export function download_meeting(id = 0){
-    return download_config('meeting', id);
-}
-
-export function download_tongling(id = 0){
-    return download_config('tongling', id);
 }
 
 export function remove_clock_config(netunit = 0){
@@ -702,4 +794,24 @@ export function remove_tongling_config(id = 0){
 
 export function remove_digittrunk_config(id = 0){
     return remove_config('digittrunk', 0, id);
+}
+
+export function remove_user_data(id = 0){
+    return remove_config('userdata', 0, id);
+}
+
+export function remove_broadcast(id = 0){
+    return remove_config('broadcast', 0, id);
+}
+
+export function remove_phonestation(id = 0) {
+    return remove_config('phonestation', 0, id);
+}
+
+export function remove_terminal_business(id = 0){
+    return remove_config('terminalbusiness', 0, id);
+}
+
+export function remove_terminal_keyconfig(id = 0){
+    return remove_config('terminalkey', 0, id);
 }

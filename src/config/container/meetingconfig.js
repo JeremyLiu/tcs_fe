@@ -1,6 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import BaseConfig from '../component/baseconfig.js'
+import UserDataSelect from '../component/usernumberselect.js'
 import {meetingConfigColumn} from '../../constant/model.js'
 import {open_confirm_dialog, close_confimr_dialog,
     remove_meeting_config, save_meeting} from '../../action/config.js'
@@ -13,8 +14,8 @@ var MeetingConfig = React.createClass({
           selectNetunit: -1,
           name: '',
           code: '',
-          users: '',
-          members: ''
+          users: [],
+          members: []
       }
     },
 
@@ -23,14 +24,15 @@ var MeetingConfig = React.createClass({
     },
 
     saveAction(select){
-        let {name, code, users, members, id} = this.state;
+        let {name, code,users, members, id} = this.state;
+
         let data = {
             id: id,
             netunit: select.value,
             name: name,
             code: code,
-            users: users,
-            members: members
+            users: users.join('\n'),
+            members: members.join('\n')
         };
         this.props.dispatch(save_meeting(data));
     },
@@ -49,16 +51,16 @@ var MeetingConfig = React.createClass({
 
     removeAction(row){
         let {dispatch} = this.props;
-        dispatch(open_confirm_dialog("删除通令配置",
+        dispatch(open_confirm_dialog("删除会议配置",
             "确定要删除"+row.netunit+"的会议配置么?（删除配置不会下载到网元）", () => {
                 dispatch(remove_meeting_config(row.id));
                 dispatch(close_confimr_dialog());
             }))
     },
 
-    handleChange(prop,e){
+    handleChange(prop,value){
         let newState = {};
-        newState[prop] = e.target.value;
+        newState[prop] = value;
         this.setState(newState);
     },
 
@@ -75,26 +77,26 @@ var MeetingConfig = React.createClass({
                            saveAction={this.saveAction} modifyAction={this.modifyAction}
                            addAction={this.addAction} removeAction={this.removeAction}>
             <div className="form-group">
-                <label className="label-4">名称</label>
-                <input type="text" className="form-control" value={name} placeholder="填写BCD码"
-                       onChange={this.handleChange.bind(this, 'name')}/>
+                <label className="label-4">业务名称</label>
+                <input type="text" className="form-control" value={name} placeholder="不超过20个字符"
+                       onChange={e=>this.handleChange('name',e.target.value)}/>
             </div>
             <div className="form-group">
-                <label className="label-4">编号</label>
-                <input type="text" className="form-control" value={code} placeholder="填写BCD码"
-                       onChange={this.handleChange.bind(this, 'code')}/>
+                <label className="label-4">业务号</label>
+                <input type="number" min="0" max="99999" className="form-control" value={code} placeholder="填写BCD码"
+                       onChange={e=>this.handleChange('code', e.target.value)}/>
             </div>
             <div className="form-group">
-                <label className="label-4">用户</label>
-                <textarea style={{width: 180, height:120}} className="form-control"
-                          value={users} placeholder="用空格或者换行分隔"
-                          onChange={this.handleChange.bind(this, 'users')}/>
+                <label className="label-4">有权用户</label>
+                <UserDataSelect placehoder="点击选择,不超过10个" style={{width: 250,float:'left'}}
+                                value={users} filter={e=>e.userLevel==13}
+                                onChange={v=>this.handleChange('users', v)}/>
             </div>
             <div className="form-group">
                 <label className="label-4">成员</label>
-                <textarea style={{width: 180, height:120}} className="form-control"
-                          value={members} placeholder="用换行分隔"
-                          onChange={this.handleChange.bind(this, 'members')}/>
+                <UserDataSelect placehoder="点击选择,不超过40个" style={{width: 250,float:'left'}}
+                                value={members} filter={e=>e.userLevel==13}
+                                onChange={v=>this.handleChange('members', v)}/>
             </div>
         </BaseConfig>
     }
@@ -114,8 +116,8 @@ function stateMap(state){
             return Object.assign({}, e, {
                 netunitId: e.netunit,
                 netunit: netunitMap[e.netunit],
-                users: e.users.join('\n'),
-                members: e.members.join('\n')
+                usersText: e.users.join('\n'),
+                membersText: e.members.join('\n')
             })
         })
     }

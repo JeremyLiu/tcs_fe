@@ -3,61 +3,80 @@ import * as Action from '../../action/config.js'
 import {CARD_TYPE_NUL} from '../../constant/model.js'
 import Combox from '../../common/component/combox.js'
 
+function defaultPortGenerate(card){
+    let port = new Array(card.portCount);
+    for(var i = 0; i< card.portCount; i++)
+        port[i] = {
+            text: i,
+            value: i
+        }
+    return port;
+}
+
+function defaultCardFilter(e){
+    return e.code != CARD_TYPE_NUL;
+}
+
 var PortSelect = React.createClass({
 
     getInitialState(){
-        let {defaultSlot, defaultPort} = this.props;
+        let {defaultSlot, defaultPort, cardLabel, portLabel} = this.props;
         return {
             card:[],
             port:[],
             defaultSlot: defaultSlot>=0?{
                 text: defaultSlot,
                 value: defaultSlot
-            }:'选择板卡号',
+            }:cardLabel,
             defaultPort: defaultPort>=0?{
                 text: defaultPort,
                 value: defaultPort
-            }:'选择端口'
+            }:portLabel
         }
     },
 
     getDefaultProps(){
         return {
-            typeFilter: -1
+            typeFilter: -1,
+            portGenerate: defaultPortGenerate,
+            cardFilter: defaultCardFilter,
+            cardLabel: '选择板卡号',
+            portLabel: '选择端口'
         }
     },
 
     componentWillMount(){
-        let {dispatch, netunit, defaultSlot, typeFilter} = this.props;
+        let {dispatch, netunit, defaultSlot,
+            typeFilter,cardFilter, portGenerate} = this.props;
         if(netunit>0)
             dispatch(Action.fetch_card_slot(netunit, typeFilter,
                 data => {
                     let portModel = this.state.port;
                     if(defaultSlot>=0) {
-                        let portCount = 0;
+                        let card;
                         for (var i = 0; i < data.length; i++)
                             if (data[i].slot == defaultSlot) {
-                                portCount = data[i].portCount;
+                                card = data[i];
                                 break;
                             }
-                        if (portCount <= 0)
+                        if(card)
+                            portModel = portGenerate(card);
+                        else
                             return;
-                        portModel = new Array(portCount);
-                        for (i = 0; i < portCount; i++)
-                            portModel[i] = {
-                                text: i,
-                                value: i
-                            }
                     }
+
+                    let cards = data.filter(cardFilter).map((e, index) => {
+                        return {
+                            text: e.slot,
+                            value: e.slot,
+                            index: index,
+                            portCount: e.portCount,
+                            code: e.code
+                        }
+                    });
+
                     this.setState({
-                        card: data.filter(e => e.code != CARD_TYPE_NUL).map((e, index) => {
-                            return {
-                                text: e.slot,
-                                value: e.slot,
-                                index: index,
-                                portCount: e.portCount
-                            }
-                        }),
+                        card: cards,
                         port: portModel
                     })
                 }));
@@ -66,38 +85,36 @@ var PortSelect = React.createClass({
     },
 
     componentWillReceiveProps(nextProps){
-        let {dispatch, netunit, defaultSlot, defaultPort, typeFilter} = nextProps;
+        let {dispatch, netunit, defaultSlot,
+            defaultPort, typeFilter, cardFilter} = nextProps;
         if(netunit > 0 && netunit!=this.props.netunit)
             dispatch(Action.fetch_card_slot(netunit, typeFilter,
                 data => {
+                    let cards = data.filter(cardFilter).map((e, index) => {
+                        return {
+                            text: e.slot,
+                            value: e.slot,
+                            index: index,
+                            portCount: e.portCount,
+                            code: e.code
+                        }
+                    });
 
                     this.setState({
-                        card: data.filter(e => e.code != CARD_TYPE_NUL).map((e, index) => {
-                            return {
-                                text: e.slot,
-                                value: e.slot,
-                                index: index,
-                                portCount: e.portCount
-                            }
-                        }),
+                        card: cards,
                         port: []
                     })
                 }));
-        if(defaultSlot!=this.props.defaultSlot || defaultPort!=this.props.defaultPort)
+        let {slot, port} = this.getSelect();
+        if(defaultSlot!=slot || defaultPort!=port)
             this.setSelect(defaultSlot, defaultPort);
     },
 
     handleSelectSlot(value){
-        let portNum = this.state.card[value.index].portCount;
-        let port = new Array(portNum);
-        for(var i = 0; i< portNum; i++)
-            port[i] = {
-                text: i,
-                value: i
-            }
+        let port = this.props.portGenerate(this.state.card[value.index]);
         this.setState({
             port: port,
-            defaultPort: '选择端口'
+            defaultPort: this.props.portLabel
         });
     },
 
@@ -132,11 +149,11 @@ var PortSelect = React.createClass({
             defaultSlot: slot>=0?{
                 text: slot,
                 value: slot
-            }:'选择板卡号',
+            }:this.props.cardLabel,
             defaultPort: port>=0?{
                 text: port,
                 value: port
-            }:'选择端口',
+            }:this.props.portLabel,
             port: portModel
         })
     },
